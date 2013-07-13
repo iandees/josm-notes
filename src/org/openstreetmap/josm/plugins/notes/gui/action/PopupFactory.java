@@ -34,14 +34,14 @@ import javax.swing.JPopupMenu;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
-import org.openstreetmap.josm.plugins.notes.gui.OsbDialog;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 
 public class PopupFactory {
 
     private static JPopupMenu issuePopup;
     private static JPopupMenu fixedPopup;
 
-    public static synchronized JPopupMenu createPopup(Node node, OsbDialog dialog) {
+    public static synchronized JPopupMenu createPopup(Node node, NotesDialog dialog) {
         if("0".equals(node.get("state"))) {
             return getIssuePopup(dialog);
         } else if("1".equals(node.get("state"))) {
@@ -51,7 +51,7 @@ public class PopupFactory {
         }
     }
 
-    private static JPopupMenu getIssuePopup(OsbDialog dialog) {
+    private static JPopupMenu getIssuePopup(NotesDialog dialog) {
         if(issuePopup == null) {
             issuePopup = new JPopupMenu();
             JMenuItem add = new JMenuItem();
@@ -59,7 +59,7 @@ public class PopupFactory {
             add.setIcon(NotesPlugin.loadIcon("add_comment16.png"));
             issuePopup.add(add);
             JMenuItem close = new JMenuItem();
-            close.setAction(new CloseIssueAction(dialog));
+            close.setAction(new CloseNoteAction(dialog));
             close.setIcon(NotesPlugin.loadIcon("icon_valid16.png"));
             issuePopup.add(close);
             JMenuItem openInBrowser = new JMenuItem();
@@ -70,7 +70,7 @@ public class PopupFactory {
         return issuePopup;
     }
 
-    private static JPopupMenu getFixedPopup(OsbDialog dialog) {
+    private static JPopupMenu getFixedPopup(NotesDialog dialog) {
         if(fixedPopup == null) {
             fixedPopup = new JPopupMenu();
             JMenuItem add = new JMenuItem();
@@ -80,7 +80,7 @@ public class PopupFactory {
             add.setIcon(NotesPlugin.loadIcon("add_comment16.png"));
             fixedPopup.add(add);
             JMenuItem close = new JMenuItem();
-            CloseIssueAction cia = new CloseIssueAction(dialog);
+            CloseNoteAction cia = new CloseNoteAction(dialog);
             cia.setEnabled(false);
             close.setAction(cia);
             close.setIcon(NotesPlugin.loadIcon("icon_valid16.png"));

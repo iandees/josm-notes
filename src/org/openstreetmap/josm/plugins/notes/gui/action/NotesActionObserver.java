@@ -27,6 +27,6 @@
  */
 package org.openstreetmap.josm.plugins.notes.gui.action;
 
-public interface OsbActionObserver {
-    public void actionPerformed(OsbAction action);
+public interface NotesActionObserver {
+    public void actionPerformed(NotesAction action);
 }

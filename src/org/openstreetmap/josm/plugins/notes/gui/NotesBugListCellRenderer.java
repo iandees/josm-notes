@@ -37,13 +37,10 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
+import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
-import org.openstreetmap.josm.plugins.notes.gui.action.AddCommentAction;
-import org.openstreetmap.josm.plugins.notes.gui.action.CloseIssueAction;
-import org.openstreetmap.josm.plugins.notes.gui.action.NewIssueAction;
-import org.openstreetmap.josm.plugins.notes.gui.action.OsbAction;
 
-public class OsbQueueListCellRenderer implements ListCellRenderer {
+public class NotesBugListCellRenderer implements ListCellRenderer {
 
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
@@ -62,17 +59,20 @@ public class OsbQueueListCellRenderer implements ListCellRenderer {
             label.setBackground(index % 2 == 0 ? background : altBackground);
         }
 
-        OsbAction action = (OsbAction) value;
+        if(!list.isEnabled()) {
+            label.setForeground(UIManager.getColor("Label.disabledForeground"));
+        }
+
+        NotesListItem item = (NotesListItem) value;
+        Node n = item.getNode();
         Icon icon = null;
-        if(action instanceof NewIssueAction) {
-            icon = NotesPlugin.loadIcon("icon_error_add16.png");
-        } else if(action instanceof AddCommentAction) {
-            icon = NotesPlugin.loadIcon("add_comment16.png");
-        } else if(action instanceof CloseIssueAction) {
+        if("0".equals(n.get("state"))) {
+            icon = NotesPlugin.loadIcon("icon_error16.png");
+        } else if("1".equals(n.get("state"))) {
             icon = NotesPlugin.loadIcon("icon_valid16.png");
         }
         label.setIcon(icon);
-        String text = action.toString();
+        String text = n.get("note");
         if(text.indexOf("<hr />") > 0) {
             text = text.substring(0, text.indexOf("<hr />"));
         }
@@ -82,6 +82,7 @@ public class OsbQueueListCellRenderer implements ListCellRenderer {
         d.height += 10;
         label.setPreferredSize(d);
 
+        label.setEnabled(list.isEnabled());
         return label;
     }
 

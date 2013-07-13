@@ -29,7 +29,6 @@ package org.openstreetmap.josm.plugins.notes.gui.action;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -40,73 +39,61 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
-import org.openstreetmap.josm.plugins.notes.api.NewAction;
+import org.openstreetmap.josm.plugins.notes.api.CloseAction;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;
 
-public class NewIssueAction extends OsbAction {
+public class CloseNoteAction extends NotesAction {
 
     private static final long serialVersionUID = 1L;
 
-    private NotesPlugin plugin;
+    private CloseAction closeAction = new CloseAction();
 
-    private String result;
+    private String comment;
 
-    private Point p;
+    private Node node;
 
-    private NewAction newAction = new NewAction();
-
-    public NewIssueAction(NotesPlugin plugin, Point p) {
-        super(tr("New issue"), plugin.getDialog());
-        this.plugin = plugin;
-        this.p = p;
+    public CloseNoteAction(NotesDialog dialog) {
+        super(tr("Mark as done"), dialog);
     }
 
     @Override
-    protected void doActionPerformed(ActionEvent e) throws IOException, InterruptedException {
-        List<String> history = new LinkedList<String>(Main.pref.getCollection(ConfigKeys.NOTES_NEW_HISTORY, new LinkedList<String>()));
+    protected void doActionPerformed(ActionEvent e) throws Exception {
+        List<String> history = new LinkedList<String>(Main.pref.getCollection(ConfigKeys.NOTES_COMMENT_HISTORY, new LinkedList<String>()));
         HistoryChangedListener l = new HistoryChangedListener() {
             public void historyChanged(List<String> history) {
-                Main.pref.putCollection(ConfigKeys.NOTES_NEW_HISTORY, history);
+                Main.pref.putCollection(ConfigKeys.NOTES_COMMENT_HISTORY, history);
             }
         };
-
-        result = TextInputDialog.showDialog(
-                Main.map,
-                tr("Create issue"),
-                tr("Describe the problem precisely"),
-                NotesPlugin.loadIcon("icon_error_add22.png"),
+        node = dialog.getSelectedNode();
+        comment = TextInputDialog.showDialog(Main.map,
+                tr("Really close?"),
+                tr("<html>Really mark this note as ''done''?<br><br>You may add an optional comment:</html>"),
+                NotesPlugin.loadIcon("icon_valid22.png"),
                 history, l);
 
-        if(result == null) {
+        if(comment == null) {
             canceled = true;
         }
+
     }
 
     @Override
     public void execute() throws IOException {
-        if (result.length() > 0) {
-            result = addMesgInfo(result);
-            Node n = newAction.execute(p, result);
-            plugin.getDataSet().addPrimitive(n);
-            if (Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
-                plugin.updateGui();
-            } else {
-                plugin.updateData();
-            }
-        }
+        closeAction.execute(node, comment);
     }
 
     @Override
     public String toString() {
-        return tr("Create: " + result);
+        return tr("Close: " + node.get("note") + " - Comment: " + comment);
     }
 
     @Override
-    public OsbAction clone() {
-        NewIssueAction action = new NewIssueAction(plugin, p);
+    public CloseNoteAction clone() {
+        CloseNoteAction action = new CloseNoteAction(dialog);
         action.canceled = canceled;
-        action.p = p;
-        action.result = result;
+        action.comment = comment;
+        action.node = node;
         return action;
     }
 }

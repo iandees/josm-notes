@@ -25,50 +25,70 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openstreetmap.josm.plugins.notes.api;
+package org.openstreetmap.josm.plugins.notes.gui.action;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.io.IOException;
-import java.net.URLEncoder;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import javax.swing.JOptionPane;
+import javax.swing.AbstractAction;
+import javax.swing.JToggleButton;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.plugins.notes.ConfigKeys;
-import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
+import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
-public class EditAction {
+public class PointToNewNoteAction extends AbstractAction implements MouseListener {
 
-    private final String CHARSET = "UTF-8";
+    private static final long serialVersionUID = 1L;
 
-    public void execute(Node n, String comment) throws IOException {
-        // create the URI for the data download
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
-        String post = new StringBuilder("id=")
-            .append(n.get("id"))
-            .append("&text=")
-            .append(URLEncoder.encode(comment, CHARSET))
-            .toString();
+    private JToggleButton button;
 
-        String result = null;
-        if(Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
-            result = "ok";
+    private NotesPlugin plugin;
+
+    private Cursor previousCursor;
+
+    public PointToNewNoteAction(JToggleButton button, NotesPlugin plugin) {
+        super(tr("New note"));
+        this.button = button;
+        this.plugin = plugin;
+    }
+
+    private void reset() {
+        Main.map.mapView.setCursor(previousCursor);
+        Main.map.mapView.removeMouseListener(this);
+        button.setSelected(false);
+    }
+
+    public void mouseClicked(MouseEvent e) {
+        addNewIssue(e);
+    }
+
+    public void mouseEntered(MouseEvent e) {}
+
+    public void mouseExited(MouseEvent e) {}
+
+    public void mousePressed(MouseEvent e) {
+        addNewIssue(e);
+    }
+
+    private void addNewIssue(MouseEvent e) {
+        NewNoteAction nia = new NewNoteAction(plugin, e.getPoint());
+        nia.actionPerformed(new ActionEvent(this, 0, ""));
+        reset();
+    }
+
+    public void mouseReleased(MouseEvent e) {}
+
+    public void actionPerformed(ActionEvent e) {
+        if(button.isSelected()) {
+            previousCursor = Main.map.mapView.getCursor();
+            Main.map.mapView.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+            Main.map.mapView.addMouseListener(this);
         } else {
-            result = HttpUtils.post(uri, post, CHARSET);
-        }
-
-        if("ok".equalsIgnoreCase(result) || "comment added\n".equalsIgnoreCase(result)) {
-            String desc = n.get("note");
-            desc = desc.concat("<hr />").concat(comment);
-            n.put("note", desc);
-            Main.map.mapView.repaint();
-        } else {
-            JOptionPane.showMessageDialog(Main.parent,
-                    tr("An error occurred: {0}", new Object[] {result}),
-                    tr("Error"),
-                    JOptionPane.ERROR_MESSAGE);
+            reset();
         }
     }
 }

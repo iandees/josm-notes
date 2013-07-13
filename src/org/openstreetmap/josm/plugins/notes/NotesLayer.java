@@ -57,7 +57,7 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
-import org.openstreetmap.josm.plugins.notes.gui.OsbDialog;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.plugins.notes.gui.action.PopupFactory;
 import org.openstreetmap.josm.tools.ColorHelper;
 
@@ -72,9 +72,9 @@ public class NotesLayer extends Layer implements MouseListener {
     private static ImageIcon iconError = NotesPlugin.loadIcon("icon_error16.png");
     private static ImageIcon iconValid = NotesPlugin.loadIcon("icon_valid16.png");
 
-    private OsbDialog dialog;
+    private NotesDialog dialog;
 
-    public NotesLayer(DataSet dataSet, String name, OsbDialog dialog) {
+    public NotesLayer(DataSet dataSet, String name, NotesDialog dialog) {
         super(name);
         this.data = dataSet;
         this.dialog = dialog;

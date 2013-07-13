@@ -27,68 +27,70 @@
  */
 package org.openstreetmap.josm.plugins.notes.gui.action;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.awt.Cursor;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.JToggleButton;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.plugins.notes.NotesPlugin;
+import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 
-public class PointToNewIssueAction extends AbstractAction implements MouseListener {
+public abstract class NotesAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-    private JToggleButton button;
+    private List<NotesActionObserver> observers = new ArrayList<NotesActionObserver>();
 
-    private NotesPlugin plugin;
+    protected final NotesDialog dialog;
 
-    private Cursor previousCursor;
+    protected boolean canceled = false;
+    protected final ActionQueue actionQueue;
 
-    public PointToNewIssueAction(JToggleButton button, NotesPlugin plugin) {
-        super(tr("New issue"));
-        this.button = button;
-        this.plugin = plugin;
+    public NotesAction(String name, NotesDialog osbDialog) {
+        super(name);
+        this.dialog = osbDialog;
+        this.actionQueue = osbDialog.getActionQueue();
     }
-
-    private void reset() {
-        Main.map.mapView.setCursor(previousCursor);
-        Main.map.mapView.removeMouseListener(this);
-        button.setSelected(false);
-    }
-
-    public void mouseClicked(MouseEvent e) {
-        addNewIssue(e);
-    }
-
-    public void mouseEntered(MouseEvent e) {}
-
-    public void mouseExited(MouseEvent e) {}
-
-    public void mousePressed(MouseEvent e) {
-        addNewIssue(e);
-    }
-
-    private void addNewIssue(MouseEvent e) {
-        NewIssueAction nia = new NewIssueAction(plugin, e.getPoint());
-        nia.actionPerformed(new ActionEvent(this, 0, ""));
-        reset();
-    }
-
-    public void mouseReleased(MouseEvent e) {}
 
     public void actionPerformed(ActionEvent e) {
-        if(button.isSelected()) {
-            previousCursor = Main.map.mapView.getCursor();
-            Main.map.mapView.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-            Main.map.mapView.addMouseListener(this);
-        } else {
-            reset();
+        canceled = false;
+        try {
+            doActionPerformed(e);
+            if(!canceled) {
+                if (!Main.pref.getBoolean(ConfigKeys.NOTES_API_OFFLINE)) {
+                    execute();
+                    for (NotesActionObserver obs : observers) {
+                        obs.actionPerformed(this);
+                    }
+                } else {
+                    NotesAction action = clone();
+                    actionQueue.offer(action);
+                }
+            }
+        } catch (Exception e1) {
+            System.err.println("Couldn't execute action " + getClass().getSimpleName());
+            e1.printStackTrace();
         }
     }
+
+    protected abstract void doActionPerformed(ActionEvent e) throws Exception;
+
+    public void addActionObserver(NotesActionObserver obs) {
+        observers.add(obs);
+    }
+
+    public void removeActionObserver(NotesActionObserver obs) {
+        observers.remove(obs);
+    }
+
+    public List<NotesActionObserver> getActionObservers() {
+        return observers;
+    }
+
+    public abstract void execute() throws Exception;
+
+    @Override
+    public abstract NotesAction clone();
 }

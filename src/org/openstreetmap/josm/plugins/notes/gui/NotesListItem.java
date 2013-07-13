@@ -29,10 +29,10 @@ package org.openstreetmap.josm.plugins.notes.gui;
 
 import org.openstreetmap.josm.data.osm.Node;
 
-public class OsbListItem {
+public class NotesListItem {
     private Node node;
 
-    public OsbListItem(Node node) {
+    public NotesListItem(Node node) {
         super();
         this.node = node;
     }
@@ -59,8 +59,8 @@ public class OsbListItem {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof OsbListItem) {
-            OsbListItem other = (OsbListItem)obj;
+        if(obj instanceof NotesListItem) {
+            NotesListItem other = (NotesListItem)obj;
             if(getNode() != null && other.getNode() != null) {
                 return getNode().getId() == other.getNode().getId();
             }

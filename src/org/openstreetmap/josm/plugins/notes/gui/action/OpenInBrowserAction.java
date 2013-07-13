@@ -36,16 +36,16 @@ import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.plugins.notes.gui.OsbDialog;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.OpenBrowser;
 
-public class OpenInBrowserAction extends OsbAction {
+public class OpenInBrowserAction extends NotesAction {
 
     private static final long serialVersionUID = 1L;
 
     private Node node;
 
-    public OpenInBrowserAction(OsbDialog dialog) {
+    public OpenInBrowserAction(NotesDialog dialog) {
         super(tr("Open in browser"), dialog);
     }
 

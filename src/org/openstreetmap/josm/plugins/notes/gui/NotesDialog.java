@@ -79,17 +79,17 @@ import org.openstreetmap.josm.plugins.notes.NotesObserver;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.gui.action.ActionQueue;
 import org.openstreetmap.josm.plugins.notes.gui.action.AddCommentAction;
-import org.openstreetmap.josm.plugins.notes.gui.action.CloseIssueAction;
-import org.openstreetmap.josm.plugins.notes.gui.action.OsbAction;
-import org.openstreetmap.josm.plugins.notes.gui.action.OsbActionObserver;
-import org.openstreetmap.josm.plugins.notes.gui.action.PointToNewIssueAction;
+import org.openstreetmap.josm.plugins.notes.gui.action.CloseNoteAction;
+import org.openstreetmap.josm.plugins.notes.gui.action.NotesAction;
+import org.openstreetmap.josm.plugins.notes.gui.action.NotesActionObserver;
+import org.openstreetmap.josm.plugins.notes.gui.action.PointToNewNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.PopupFactory;
 import org.openstreetmap.josm.plugins.notes.gui.action.ToggleConnectionModeAction;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
 import org.openstreetmap.josm.tools.Shortcut;
 
-public class OsbDialog extends ToggleDialog implements NotesObserver, ListSelectionListener, LayerChangeListener,
-DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
+public class NotesDialog extends ToggleDialog implements NotesObserver, ListSelectionListener, LayerChangeListener,
+DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
 
     private static final long serialVersionUID = 1L;
     private JPanel bugListPanel, queuePanel;
@@ -110,7 +110,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
 
     private boolean buttonLabels = Main.pref.getBoolean(ConfigKeys.NOTES_BUTTON_LABELS);
 
-    public OsbDialog(final NotesPlugin plugin) {
+    public NotesDialog(final NotesPlugin plugin) {
         super(tr("Open OpenStreetBugs"), "icon_error24",
                 tr("Opens the OpenStreetBugs window and activates the automatic download"), Shortcut.registerShortcut(
                         "view:openstreetbugs", tr("Toggle: {0}", tr("Open OpenStreetBugs")), KeyEvent.VK_B,
@@ -126,7 +126,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
         bugList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         bugList.addListSelectionListener(this);
         bugList.addMouseListener(this);
-        bugList.setCellRenderer(new OsbBugListCellRenderer());
+        bugList.setCellRenderer(new NotesBugListCellRenderer());
         bugListPanel.add(new JScrollPane(bugList), BorderLayout.CENTER);
 
         // create dialog buttons
@@ -168,12 +168,12 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
         addComment.setEnabled(false);
         addComment.setToolTipText((String) addComment.getAction().getValue(Action.NAME));
         addComment.setIcon(NotesPlugin.loadIcon("add_comment22.png"));
-        CloseIssueAction closeIssueAction = new CloseIssueAction(this);
+        CloseNoteAction closeIssueAction = new CloseNoteAction(this);
         closeIssue = new JButton(closeIssueAction);
         closeIssue.setEnabled(false);
         closeIssue.setToolTipText((String) closeIssue.getAction().getValue(Action.NAME));
         closeIssue.setIcon(NotesPlugin.loadIcon("icon_valid22.png"));
-        PointToNewIssueAction nia = new PointToNewIssueAction(newIssue, osbPlugin);
+        PointToNewNoteAction nia = new PointToNewNoteAction(newIssue, osbPlugin);
         newIssue.setAction(nia);
         newIssue.setToolTipText((String) newIssue.getAction().getValue(Action.NAME));
         newIssue.setIcon(NotesPlugin.loadIcon("icon_error_add22.png"));
@@ -187,7 +187,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
         queuePanel = new JPanel(new BorderLayout());
         queuePanel.setName(tr("Queue"));
         queueList = new JList(getActionQueue());
-        queueList.setCellRenderer(new OsbQueueListCellRenderer());
+        queueList.setCellRenderer(new NotesQueueListCellRenderer());
         queuePanel.add(new JScrollPane(queueList), BorderLayout.CENTER);
         queuePanel.add(processQueue, BorderLayout.SOUTH);
         processQueue.addActionListener(new ActionListener() {
@@ -255,7 +255,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
         Collections.sort(sortedList, new BugComparator());
         for (Node node : sortedList) {
             if (node.isUsable()) {
-                bugListModel.addElement(new OsbListItem(node));
+                bugListModel.addElement(new NotesListItem(node));
             }
         }
         bugList.setModel(bugListModel);
@@ -270,7 +270,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
 
         List<OsmPrimitive> selected = new ArrayList<OsmPrimitive>();
         for (Object listItem : bugList.getSelectedValues()) {
-            Node node = ((OsbListItem) listItem).getNode();
+            Node node = ((NotesListItem) listItem).getNode();
             selected.add(node);
 
             if ("1".equals(node.get("state"))) {
@@ -297,7 +297,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
 
     private void scrollToSelected(Node node) {
         for (int i = 0; i < bugListModel.getSize(); i++) {
-            Node current = ((OsbListItem) bugListModel.get(i)).getNode();
+            Node current = ((NotesListItem) bugListModel.get(i)).getNode();
             if (current.getId()== node.getId()) {
                 bugList.scrollRectToVisible(bugList.getCellBounds(i, i));
                 bugList.setSelectedIndex(i);
@@ -360,8 +360,8 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
     public void mouseExited(MouseEvent e) {
     }
 
-    public void actionPerformed(OsbAction action) {
-        if (action instanceof AddCommentAction || action instanceof CloseIssueAction) {
+    public void actionPerformed(NotesAction action) {
+        if (action instanceof AddCommentAction || action instanceof CloseNoteAction) {
             update(osbPlugin.getDataSet());
         }
     }
@@ -422,7 +422,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
 
     public Node getSelectedNode() {
         if(bugList.getSelectedValue() != null) {
-            return ((OsbListItem)bugList.getSelectedValue()).getNode();
+            return ((NotesListItem)bugList.getSelectedValue()).getNode();
         } else {
             return null;
         }
@@ -432,7 +432,7 @@ DataSetListener, SelectionChangedListener, MouseListener, OsbActionObserver {
         if(node == null) {
             bugList.clearSelection();
         } else {
-            bugList.setSelectedValue(new OsbListItem(node), true);
+            bugList.setSelectedValue(new NotesListItem(node), true);
         }
     }
 

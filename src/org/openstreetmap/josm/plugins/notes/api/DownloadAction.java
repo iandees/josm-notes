@@ -28,17 +28,23 @@
 package org.openstreetmap.josm.plugins.notes.api;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.StringReader;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 public class DownloadAction {
 
@@ -46,7 +52,7 @@ public class DownloadAction {
 
     public void execute(DataSet dataset, Bounds bounds) throws IOException {
         // create the URI for the data download
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_DOWNLOAD);
+        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
 
         int zoom = OsmUrlToBounds.getZoom(Main.map.mapView.getRealBounds());
         // check zoom level
@@ -56,10 +62,10 @@ public class DownloadAction {
 
         // add query params to the uri
         StringBuilder sb = new StringBuilder(uri)
-            .append("?b=").append(bounds.getMin().lat())
-            .append("&t=").append(bounds.getMax().lat())
-            .append("&l=").append(bounds.getMin().lon())
-            .append("&r=").append(bounds.getMax().lon());
+            .append("?bbox=").append(bounds.getMin().lon())
+            .append(",").append(bounds.getMin().lat())
+            .append(",").append(bounds.getMax().lon())
+            .append(",").append(bounds.getMax().lat());
         uri = sb.toString();
 
         // download the data
@@ -73,22 +79,23 @@ public class DownloadAction {
     }
 
     private void parseData(DataSet dataSet, String content) {
-        String idPattern = "\\d+";
-        String floatPattern = "-?\\d+\\.\\d+";
-        String pattern = "putAJAXMarker\\s*\\(\\s*("+idPattern+")\\s*,\\s*("+floatPattern+")\\s*,\\s*("+floatPattern+")\\s*,\\s*(?:\"|\')(.*)(?:\"|\')\\s*,\\s*([01])\\s*\\)";
-        Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(content);
-        while(m.find()) {
-            double lat = Double.parseDouble(m.group(3));
-            double lon = Double.parseDouble(m.group(2));
-            LatLon latlon = new LatLon(lat, lon);
-            Node osmNode = new Node(Long.parseLong(m.group(1)), 1);
-            osmNode.setCoor(latlon);
-            osmNode.put("id", m.group(1));
-            osmNode.put("note", m.group(4));
-            osmNode.put("openstreetbug", "FIXME");
-            osmNode.put("state", m.group(5));
-            dataSet.addPrimitive(osmNode);
+        NotesXmlParser handler = new NotesXmlParser();
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        try {
+            SAXParser saxParser = factory.newSAXParser();
+            XMLReader xmlReader = saxParser.getXMLReader();
+            xmlReader.setContentHandler(handler);
+            xmlReader.parse(new InputSource(new StringReader(content)));
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (Node note : handler.getNotes()) {
+            dataSet.addPrimitive(note);
         }
     }
 }

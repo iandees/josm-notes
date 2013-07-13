@@ -47,7 +47,7 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.plugins.notes.api.DownloadAction;
-import org.openstreetmap.josm.plugins.notes.gui.OsbDialog;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
@@ -61,7 +61,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
 
     private UploadHook uploadHook;
 
-    private OsbDialog dialog;
+    private NotesDialog dialog;
 
     private NotesLayer layer;
 
@@ -76,7 +76,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
     @Override
     public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {
         if (newFrame != null) {
-            dialog = new OsbDialog(this);
+            dialog = new NotesDialog(this);
             newFrame.addToggleDialog(dialog);
 
             MapView.addLayerChangeListener(this);
@@ -98,54 +98,16 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
             Main.pref.put(ConfigKeys.NOTES_API_DISABLED, debug);
         }
 
-        // check, which api is used
-        String uriNew = Main.pref.get(ConfigKeys.NOTES_API_URI_NEW);
-        boolean oldApi = uriNew != null && uriNew.contains("appspot");
-        boolean switchApi = true;
-        if(oldApi) {
-            int choice = JOptionPane.showConfirmDialog(Main.parent,
-                    tr("<html>The openstreetbugs plugin is using the old server at appspot.com.<br>" +
-                            "A new server is available at schokokeks.org.<br>" +
-                            "Do you want to switch to the new server? (Strongly recommended)</html>"),
-                    tr("Switch to new openstreetbugs server?"),
-                    JOptionPane.YES_NO_OPTION);
-            switchApi = choice == JOptionPane.YES_OPTION;
-        }
-
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_EDIT);
-        if(uri == null || uri.length() == 0 || switchApi) {
-            uri = "http://openstreetbugs.schokokeks.org/api/0.1/editPOIexec";
-            Main.pref.put(ConfigKeys.NOTES_API_URI_EDIT, uri);
-        }
-
-        uri = Main.pref.get(ConfigKeys.NOTES_API_URI_CLOSE);
-        if(uri == null || uri.length() == 0 || switchApi) {
-            uri = "http://openstreetbugs.schokokeks.org/api/0.1/closePOIexec";
-            Main.pref.put(ConfigKeys.NOTES_API_URI_CLOSE, uri);
-        }
-
-        uri = Main.pref.get(ConfigKeys.NOTES_API_URI_DOWNLOAD);
-        if(uri == null || uri.length() == 0 || switchApi) {
-            uri = "http://openstreetbugs.schokokeks.org/api/0.1/getBugs";
-            Main.pref.put(ConfigKeys.NOTES_API_URI_DOWNLOAD, uri);
-        }
-
-        uri = Main.pref.get(ConfigKeys.NOTES_API_URI_NEW);
-        if(uri == null || uri.length() == 0 || switchApi) {
-            uri = "http://openstreetbugs.schokokeks.org/api/0.1/addPOIexec";
-            Main.pref.put(ConfigKeys.NOTES_API_URI_NEW, uri);
+        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
+        if(uri == null || uri.length() == 0) {
+            uri = "http://api.openstreetmap.org/api/0.6/notes";
+            Main.pref.put(ConfigKeys.NOTES_API_URI_BASE, uri);
         }
 
         String auto_download = Main.pref.get(ConfigKeys.NOTES_AUTO_DOWNLOAD);
         if(auto_download == null || auto_download.length() == 0) {
             auto_download = "true";
             Main.pref.put(ConfigKeys.NOTES_AUTO_DOWNLOAD, auto_download);
-        }
-
-        String include_date = Main.pref.get(ConfigKeys.NOTES_INCLUDE_DATE);
-        if(include_date == null || include_date.length() == 0) {
-            include_date = "true";
-            Main.pref.put(ConfigKeys.NOTES_INCLUDE_DATE, include_date);
         }
     }
 
@@ -183,7 +145,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
             bounds = bounds();
         } catch (Exception e) {
             // something went wrong, probably the mapview isn't fully initialized
-            System.err.println("OpenStreetBugs: Couldn't determine bounds of currently visible rect. Cancel auto update");
+            System.err.println("Notes: Couldn't determine bounds of currently visible rect. Cancel auto update");
             return;
         }
 
@@ -244,7 +206,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
 
     private synchronized void updateLayer(DataSet osbData) {
         if(layer == null) {
-            layer = new NotesLayer(osbData, "OpenStreetBugs", dialog);
+            layer = new NotesLayer(osbData, "Notes", dialog);
             Main.main.addLayer(layer);
         }
     }
@@ -276,7 +238,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         return dataSet;
     }
 
-    public OsbDialog getDialog() {
+    public NotesDialog getDialog() {
         return dialog;
     }
 }

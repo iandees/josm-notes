@@ -29,6 +29,7 @@ package org.openstreetmap.josm.plugins.notes.gui.action;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -39,68 +40,72 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
-import org.openstreetmap.josm.plugins.notes.api.CloseAction;
-import org.openstreetmap.josm.plugins.notes.api.EditAction;
-import org.openstreetmap.josm.plugins.notes.gui.OsbDialog;
+import org.openstreetmap.josm.plugins.notes.api.NewAction;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;
 
-public class CloseIssueAction extends OsbAction {
+public class NewNoteAction extends NotesAction {
 
     private static final long serialVersionUID = 1L;
 
-    private CloseAction closeAction = new CloseAction();
-    private EditAction commentAction = new EditAction();
+    private NotesPlugin plugin;
 
-    private String comment;
+    private String result;
 
-    private Node node;
+    private Point p;
 
-    public CloseIssueAction(OsbDialog dialog) {
-        super(tr("Mark as done"), dialog);
+    private NewAction newAction = new NewAction();
+
+    public NewNoteAction(NotesPlugin plugin, Point p) {
+        super(tr("New note"), plugin.getDialog());
+        this.plugin = plugin;
+        this.p = p;
     }
 
     @Override
-    protected void doActionPerformed(ActionEvent e) throws Exception {
-        List<String> history = new LinkedList<String>(Main.pref.getCollection(ConfigKeys.NOTES_COMMENT_HISTORY, new LinkedList<String>()));
+    protected void doActionPerformed(ActionEvent e) throws IOException, InterruptedException {
+        List<String> history = new LinkedList<String>(Main.pref.getCollection(ConfigKeys.NOTES_NEW_HISTORY, new LinkedList<String>()));
         HistoryChangedListener l = new HistoryChangedListener() {
             public void historyChanged(List<String> history) {
-                Main.pref.putCollection(ConfigKeys.NOTES_COMMENT_HISTORY, history);
+                Main.pref.putCollection(ConfigKeys.NOTES_NEW_HISTORY, history);
             }
         };
-        node = dialog.getSelectedNode();
-        comment = TextInputDialog.showDialog(Main.map,
-                tr("Really close?"),
-                tr("<html>Really mark this issue as ''done''?<br><br>You may add an optional comment:</html>"),
-                NotesPlugin.loadIcon("icon_valid22.png"),
+
+        result = TextInputDialog.showDialog(
+                Main.map,
+                tr("Create note"),
+                tr("Describe the problem precisely"),
+                NotesPlugin.loadIcon("icon_error_add22.png"),
                 history, l);
 
-        if(comment == null) {
+        if(result == null) {
             canceled = true;
         }
-
     }
 
     @Override
     public void execute() throws IOException {
-        // add empty comment anyway, it is required to store submitter's name
-//        if (comment.length() > 0) {
-            comment = addMesgInfo(comment);
-            commentAction.execute(node, comment);
-//        }
-        closeAction.execute(node);
+        if (result.length() > 0) {
+            Node n = newAction.execute(p, result);
+            plugin.getDataSet().addPrimitive(n);
+            if (Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
+                plugin.updateGui();
+            } else {
+                plugin.updateData();
+            }
+        }
     }
 
     @Override
     public String toString() {
-        return tr("Close: " + node.get("note") + " - Comment: " + comment);
+        return tr("Create: " + result);
     }
 
     @Override
-    public CloseIssueAction clone() {
-        CloseIssueAction action = new CloseIssueAction(dialog);
+    public NotesAction clone() {
+        NewNoteAction action = new NewNoteAction(plugin, p);
         action.canceled = canceled;
-        action.comment = comment;
-        action.node = node;
+        action.p = p;
+        action.result = result;
         return action;
     }
 }

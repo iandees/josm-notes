@@ -42,12 +42,19 @@ public class CloseAction {
 
     private final String CHARSET = "UTF-8";
 
-    public void execute(Node n) throws IOException {
-        // create the URI for the data download
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_CLOSE);
-        String post = new StringBuilder("id=")
+    public void execute(Node n, String closeMsg) throws IOException {
+        // create the URI for the note close
+        String uri = new StringBuilder(Main.pref.get(ConfigKeys.NOTES_API_URI_BASE))
+            .append("/")
             .append(n.get("id"))
+            .append("/close")
             .toString();
+        String post = "";
+        if (closeMsg != null) {
+            post = new StringBuilder("text=")
+                .append(closeMsg)
+                .toString();
+        }
 
         String result = null;
         if(Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {

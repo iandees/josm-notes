@@ -29,15 +29,10 @@ package org.openstreetmap.josm.plugins.notes;
 
 public class ConfigKeys {
     public static final String NOTES_API_DISABLED = "notes.api.disabled";
-    public static final String NOTES_API_URI_CLOSE = "notes.uri.close";
-    public static final String NOTES_API_URI_DOWNLOAD = "notes.uri.download";
-    public static final String NOTES_API_URI_EDIT = "notes.uri.edit";
-    public static final String NOTES_API_URI_NEW = "notes.uri.new";
+    public static final String NOTES_API_URI_BASE = "notes.uri.base";
     public static final String NOTES_AUTO_DOWNLOAD = "notes.auto_download";
     public static final String NOTES_BUTTON_LABELS = "notes.button_labels";
     public static final String NOTES_COMMENT_HISTORY = "notes.comment.history";
-    public static final String NOTES_INCLUDE_DATE = "notes.include_date";
     public static final String NOTES_NEW_HISTORY = "notes.new.history";
-    public static final String NOTES_NICKNAME = "notes.nickname";
     public static final String NOTES_API_OFFLINE = "notes.api.offline";
 }

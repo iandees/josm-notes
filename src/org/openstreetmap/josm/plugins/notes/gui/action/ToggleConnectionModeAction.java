@@ -11,18 +11,18 @@ import javax.swing.JToggleButton;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
-import org.openstreetmap.josm.plugins.notes.gui.OsbDialog;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 
 public class ToggleConnectionModeAction extends AbstractAction {
 
     private final NotesPlugin plugin;
-    private final OsbDialog dialog;
+    private final NotesDialog dialog;
     private final ActionQueue actionQueue;
 
     public static final String MSG_ONLINE = tr("Switch to online mode");
     public static final String MSG_OFFLINE = tr("Switch to offline mode");
 
-    public ToggleConnectionModeAction(OsbDialog osbDialog, NotesPlugin osbPlugin) {
+    public ToggleConnectionModeAction(NotesDialog osbDialog, NotesPlugin osbPlugin) {
         super(MSG_OFFLINE);
         this.dialog = osbDialog;
         this.plugin = osbPlugin;
@@ -64,7 +64,7 @@ public class ToggleConnectionModeAction extends AbstractAction {
             // if we switch to online mode, ask if the queue should be processed
             int result = JOptionPane.showConfirmDialog(Main.parent,
                 tr("You have unsaved changes in your queue. Do you want to submit them now?"),
-                tr("OpenStreetBugs"),
+                tr("Notes"),
                 JOptionPane.YES_NO_OPTION);
             if(result == JOptionPane.YES_OPTION) {
                 try {

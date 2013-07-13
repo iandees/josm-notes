@@ -40,10 +40,10 @@ import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.EditAction;
-import org.openstreetmap.josm.plugins.notes.gui.OsbDialog;
+import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;
 
-public class AddCommentAction extends OsbAction {
+public class AddCommentAction extends NotesAction {
 
     private static final long serialVersionUID = 1L;
 
@@ -53,7 +53,7 @@ public class AddCommentAction extends OsbAction {
 
     private Node node;
 
-    public AddCommentAction(OsbDialog dialog) {
+    public AddCommentAction(NotesDialog dialog) {
         super(tr("Add a comment"), dialog);
     }
 
@@ -80,7 +80,6 @@ public class AddCommentAction extends OsbAction {
 
     @Override
     public void execute() throws IOException {
-        comment = addMesgInfo(comment);
         editAction.execute(node, comment);
     }
 

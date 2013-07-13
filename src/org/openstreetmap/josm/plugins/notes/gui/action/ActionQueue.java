@@ -6,20 +6,20 @@ import javax.swing.AbstractListModel;
 
 public class ActionQueue extends AbstractListModel {
 
-    private LinkedList<OsbAction> queue = new LinkedList<OsbAction>();
+    private LinkedList<NotesAction> queue = new LinkedList<NotesAction>();
 
-    public boolean offer(OsbAction e) {
+    public boolean offer(NotesAction e) {
         boolean result = queue.offer(e);
         fireIntervalAdded(this, queue.size()-1, queue.size()-1);
         return result;
     }
 
-    public OsbAction peek() {
+    public NotesAction peek() {
         return queue.peek();
     }
 
-    public OsbAction poll() {
-        OsbAction action = queue.poll();
+    public NotesAction poll() {
+        NotesAction action = queue.poll();
         fireIntervalRemoved(this, 0, 0);
         return action;
     }
@@ -35,13 +35,13 @@ public class ActionQueue extends AbstractListModel {
     public void processQueue() throws Exception {
         while(!queue.isEmpty()) {
             // get the first action, but leave it in queue
-            OsbAction action = queue.peek();
+            NotesAction action = queue.peek();
 
             // execute the action
             action.execute();
 
             // notify observers
-            for (OsbActionObserver obs : action.getActionObservers()) {
+            for (NotesActionObserver obs : action.getActionObservers()) {
                 obs.actionPerformed(action);
             }
 

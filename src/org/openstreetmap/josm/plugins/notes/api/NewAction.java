@@ -50,7 +50,7 @@ public class NewAction {
         LatLon latlon = Main.map.mapView.getLatLon(p.x, p.y);
 
         // create the URI for the data download
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_NEW);
+        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
 
         String post = new StringBuilder("lon=")
             .append(latlon.lon())
