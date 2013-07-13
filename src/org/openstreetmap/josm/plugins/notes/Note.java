@@ -17,7 +17,7 @@ public class Note {
     private State state;
     private List<Note.Comment> comments = new ArrayList<Note.Comment>();
 
-    class Comment {
+    public class Comment {
         private String text;
         private User user;
         private Date createdAt;
