@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.plugins.notes;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class Note {
     private LatLon latLon;
     private Date createdAt;
     private State state;
-    private List<Note.Comment> comments;
+    private List<Note.Comment> comments = new ArrayList<Note.Comment>();
 
     class Comment {
         private String text;
