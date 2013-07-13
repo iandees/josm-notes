@@ -43,6 +43,10 @@ public class Note {
     public Note(LatLon latLon) {
         this.latLon = latLon;
     }
+    
+    public long getId() {
+    	return id;
+    }
 
     public LatLon getLatLon() {
         return latLon;
