@@ -37,8 +37,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
@@ -94,7 +94,7 @@ public class DownloadAction {
             e.printStackTrace();
         }
 
-        for (Node note : handler.getNotes()) {
+        for (Note note : handler.getNotes()) {
             dataSet.addPrimitive(note);
         }
     }
