@@ -31,8 +31,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map;
 
 import org.openstreetmap.josm.tools.Utils;
 
@@ -59,29 +61,44 @@ public class HttpUtils {
      * @return
      * @throws IOException
      */
-    public static String post(String url, String content, String responseCharset) throws IOException {
-        System.out.println("Fetching POST " + url);
-        // initialize the connection
-        URL page = new URL(url);
-        URLConnection con = page.openConnection();
-        con.setDoOutput(true);
+    public static String post(String url, String content, String responseCharset) {
+    	try {
+    		System.out.println("Fetching POST " + url);
+    		// initialize the connection
 
-        //send the post
-        OutputStream os = con.getOutputStream();
-        os.write(content.getBytes("UTF-8"));
-        os.flush();
+    		URL page = new URL(url);
+    		HttpURLConnection connection = Utils.openHttpConnection(page);
 
-        // read the response
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int length = -1;
-        byte[] b = new byte[1024];
-        InputStream in = con.getInputStream();
-        while( (length = in.read(b)) > 0 ) {
-            bos.write(b, 0, length);
-        }
-        Utils.close(in);
-        Utils.close(os);
+    		NoteConnection noteConnection = new NoteConnection();
 
-        return new String(bos.toByteArray(), responseCharset);
+    		noteConnection.addAuth(connection);
+    		connection.setDoOutput(true);
+    		connection.connect();
+
+    		//send the post
+    		OutputStream os = connection.getOutputStream();
+    		os.write(content.getBytes("UTF-8"));
+    		os.flush();
+
+    		// read the response
+    		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    		int length = -1;
+    		byte[] b = new byte[1024];
+    		InputStream in = connection.getInputStream();
+    		while( (length = in.read(b)) > 0 ) {
+    			bos.write(b, 0, length);
+    		}
+    		Utils.close(in);
+    		Utils.close(os);
+
+    		if(connection.getResponseCode() == 200) {
+    			return "ok";
+    		}
+    		return new String(bos.toByteArray(), responseCharset);
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    		return e.getMessage();
+    	}
     }
 }
