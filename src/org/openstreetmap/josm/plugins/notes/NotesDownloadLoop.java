@@ -47,6 +47,7 @@ public class NotesDownloadLoop extends Thread {
     private NotesPlugin plugin;
 
     private Point2D lastCenter;
+    private double lastScale;
 
     public NotesDownloadLoop() {
         setName(tr("Notes download loop"));
@@ -70,9 +71,11 @@ public class NotesDownloadLoop extends Thread {
                 // zoomed the map
                 if(Main.map != null && Main.map.mapView != null) {
                     Point2D currentCenter = Main.map.mapView.getCenter();
-                    if(currentCenter != null && !currentCenter.equals(lastCenter)) {
+                    double currentScale = Main.map.mapView.getScale();
+                    if((currentCenter != null && !currentCenter.equals(lastCenter)) || (Math.abs(currentScale - lastScale) > 1)) {
                         resetCountdown();
                         lastCenter = currentCenter;
+                        lastScale = currentScale;
                     }
                 }
 
