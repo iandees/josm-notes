@@ -32,7 +32,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 
@@ -41,14 +41,15 @@ public class PopupFactory {
     private static JPopupMenu issuePopup;
     private static JPopupMenu fixedPopup;
 
-    public static synchronized JPopupMenu createPopup(Node node, NotesDialog dialog) {
-        if("0".equals(node.get("state"))) {
-            return getIssuePopup(dialog);
-        } else if("1".equals(node.get("state"))) {
-            return getFixedPopup(dialog);
-        } else {
-            throw new RuntimeException(tr("Unknown issue state"));
-        }
+    public static synchronized JPopupMenu createPopup(Note note, NotesDialog dialog) {
+    	switch (note.getState()) {
+		case open:
+			return getIssuePopup(dialog);
+		case closed:
+			return getFixedPopup(dialog);
+		default:
+			throw new RuntimeException(tr("Unknown note state"));
+		}
     }
 
     private static JPopupMenu getIssuePopup(NotesDialog dialog) {

@@ -71,6 +71,7 @@ import org.openstreetmap.josm.plugins.notes.gui.action.CloseNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NotesAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NotesActionObserver;
 import org.openstreetmap.josm.plugins.notes.gui.action.PointToNewNoteAction;
+import org.openstreetmap.josm.plugins.notes.gui.action.PopupFactory;
 import org.openstreetmap.josm.plugins.notes.gui.action.ToggleConnectionModeAction;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
 import org.openstreetmap.josm.tools.Shortcut;
@@ -333,8 +334,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
             bugList.setSelectedIndex(selectedRow);
             Note selectedNote = getSelectedNote();
             if(selectedNote != null) {
-                System.out.println("Note popup goes here for note ID " + selectedNote.getId());
-//                PopupFactory.createPopup(selectedNode, this).show(e.getComponent(), e.getX(), e.getY());
+                PopupFactory.createPopup(selectedNote, this).show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
