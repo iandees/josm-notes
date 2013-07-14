@@ -121,10 +121,10 @@ public class NotesLayer extends Layer implements MouseListener {
             ImageIcon icon = null;
             switch(note.getState()) {
                 case closed:
-                    icon = iconError;
+                    icon = iconValid;
                     break;
                 case open:
-                    icon = iconValid;
+                    icon = iconError;
                     break;
             }
             int width = icon.getIconWidth();
