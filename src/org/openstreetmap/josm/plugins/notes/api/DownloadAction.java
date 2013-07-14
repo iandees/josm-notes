@@ -28,29 +28,25 @@
 package org.openstreetmap.josm.plugins.notes.api;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 public class DownloadAction {
 
     private final String CHARSET = "UTF-8";
 
-    public void execute(DataSet dataset, Bounds bounds) throws IOException {
+    public void execute(List<Note> dataset, Bounds bounds) throws IOException {
         // create the URI for the data download
         String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
 
@@ -78,14 +74,10 @@ public class DownloadAction {
         parseData(dataset, content);
     }
 
-    private void parseData(DataSet dataSet, String content) {
-        NotesXmlParser handler = new NotesXmlParser();
-        SAXParserFactory factory = SAXParserFactory.newInstance();
+    private void parseData(List<Note> dataSet, String content) {
+        List<Note> notes = new ArrayList<Note>();
         try {
-            SAXParser saxParser = factory.newSAXParser();
-            XMLReader xmlReader = saxParser.getXMLReader();
-            xmlReader.setContentHandler(handler);
-            xmlReader.parse(new InputSource(new StringReader(content)));
+            notes = NotesXmlParser.parseNotes(content);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -94,8 +86,7 @@ public class DownloadAction {
             e.printStackTrace();
         }
 
-        for (Note note : handler.getNotes()) {
-            dataSet.addPrimitive(note);
-        }
+        dataSet.clear();
+        dataSet.addAll(notes);
     }
 }

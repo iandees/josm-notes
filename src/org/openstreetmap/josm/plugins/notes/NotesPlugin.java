@@ -29,6 +29,9 @@ package org.openstreetmap.josm.plugins.notes;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -37,8 +40,6 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.UploadAction;
 import org.openstreetmap.josm.actions.upload.UploadHook;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
@@ -57,7 +58,7 @@ import org.openstreetmap.josm.tools.ImageProvider;
  */
 public class NotesPlugin extends Plugin implements LayerChangeListener {
 
-    private DataSet dataSet;
+    private List<Note> dataSet = new ArrayList<Note>();
 
     private UploadHook uploadHook;
 
@@ -70,7 +71,6 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
     public NotesPlugin(PluginInformation info) {
         super(info);
         initConfig();
-        dataSet = new DataSet();
     }
 
     @Override
@@ -137,7 +137,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         }
 
         // store the current selected node
-        Node selectedNode = getDialog().getSelectedNode();
+        Note selectedNote = getDialog().getSelectedNote();
 
         // determine the bounds of the currently visible area
         Bounds bounds = null;
@@ -157,7 +157,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
                 download.execute(dataSet, bounds);
 
                 // display the parsed data
-                if(!dataSet.getNodes().isEmpty() && dialog.isDialogShowing()) {
+                if(!dataSet.isEmpty() && dialog.isDialogShowing()) {
                     // if the map layer has been closed, while we are requesting the osb db,
                     // we don't have to update the gui, because the user is not interested
                     // in this area anymore
@@ -179,7 +179,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
 
 
         // restore node selection
-        dialog.setSelectedNode(selectedNode);
+        dialog.setSelectedNode(selectedNote);
 
         // enable the dialog
         try {
@@ -204,7 +204,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         Main.map.mapView.repaint();
     }
 
-    private synchronized void updateLayer(DataSet osbData) {
+    private synchronized void updateLayer(List<Note> osbData) {
         if(layer == null) {
             layer = new NotesLayer(osbData, "Notes", dialog);
             Main.main.addLayer(layer);
@@ -234,7 +234,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         return layer;
     }
 
-    public DataSet getDataSet() {
+    public List<Note> getDataSet() {
         return dataSet;
     }
 

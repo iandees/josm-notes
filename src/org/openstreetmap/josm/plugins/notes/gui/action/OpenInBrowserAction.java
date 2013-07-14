@@ -35,7 +35,7 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.OpenBrowser;
 
@@ -43,7 +43,7 @@ public class OpenInBrowserAction extends NotesAction {
 
     private static final long serialVersionUID = 1L;
 
-    private Node node;
+    private Note note;
 
     public OpenInBrowserAction(NotesDialog dialog) {
         super(tr("Open in browser"), dialog);
@@ -51,9 +51,9 @@ public class OpenInBrowserAction extends NotesAction {
 
     @Override
     protected void doActionPerformed(ActionEvent e) throws Exception {
-        node = dialog.getSelectedNode();
-        if(node != null) {
-            String uri = "http://openstreetbugs.schokokeks.org/?lon="+node.getCoor().getX()+"&lat="+node.getCoor().getY()+"&zoom=16&layers=B00T";
+        note = dialog.getSelectedNote();
+        if(note != null) {
+            String uri = "http://openstreetmap.org/browse/note/" + note.getId();
             System.out.println("Opening URI " + uri);
             OpenBrowser.displayUrl(uri);
         } else {
@@ -67,13 +67,13 @@ public class OpenInBrowserAction extends NotesAction {
 
     @Override
     public String toString() {
-        return tr("Open in browser: " + node.get("note"));
+        return tr("Open in browser: Note " + note.getId());
     }
 
     @Override
     public OpenInBrowserAction clone() {
         OpenInBrowserAction action = new OpenInBrowserAction(dialog);
-        action.node = node;
+        action.note = note;
         return action;
     }
 }

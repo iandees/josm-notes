@@ -34,19 +34,19 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
 
 public class CloseAction {
 
     private final String CHARSET = "UTF-8";
 
-    public void execute(Node n, String closeMsg) throws IOException {
+    public void execute(Note n, String closeMsg) throws IOException {
         // create the URI for the note close
         String uri = new StringBuilder(Main.pref.get(ConfigKeys.NOTES_API_URI_BASE))
             .append("/")
-            .append(n.get("id"))
+            .append(n.getId())
             .append("/close")
             .toString();
         String post = "";
@@ -64,7 +64,7 @@ public class CloseAction {
         }
 
         if("ok".equalsIgnoreCase(result.trim())) {
-            n.put("state", "1");
+            n.setState(Note.State.closed);
             Main.map.mapView.repaint();
         } else {
             JOptionPane.showMessageDialog(Main.parent,

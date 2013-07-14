@@ -43,7 +43,7 @@ public class Note {
     public Note(LatLon latLon) {
         this.latLon = latLon;
     }
-    
+
     public long getId() {
     	return id;
     }
@@ -78,6 +78,18 @@ public class Note {
 
     public void addComment(Note.Comment comment) {
         this.comments.add(comment);
+    }
+
+    public Note.Comment getFirstComment() {
+        return this.comments.get(0);
+    }
+
+    public void updateWith(Note note) {
+        this.comments = note.comments;
+        this.createdAt = note.createdAt;
+        this.id = note.id;
+        this.state = note.state;
+        this.latLon = note.latLon;
     }
 
 }

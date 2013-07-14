@@ -1,5 +1,7 @@
 package org.openstreetmap.josm.plugins.notes;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,10 +10,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.User;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class NotesXmlParser extends DefaultHandler {
@@ -80,6 +88,16 @@ public class NotesXmlParser extends DefaultHandler {
 
     public List<Note> getNotes() {
         return Collections.unmodifiableList(notes);
+    }
+
+    public static List<Note> parseNotes(String data) throws SAXException, ParserConfigurationException, IOException {
+        NotesXmlParser handler = new NotesXmlParser();
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser saxParser = factory.newSAXParser();
+        XMLReader xmlReader = saxParser.getXMLReader();
+        xmlReader.setContentHandler(handler);
+        xmlReader.parse(new InputSource(new StringReader(data)));
+        return handler.getNotes();
     }
 
 }

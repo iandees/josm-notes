@@ -57,24 +57,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.SelectionChangedListener;
-import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
-import org.openstreetmap.josm.data.osm.event.DataChangedEvent;
-import org.openstreetmap.josm.data.osm.event.DataSetListener;
-import org.openstreetmap.josm.data.osm.event.NodeMovedEvent;
-import org.openstreetmap.josm.data.osm.event.PrimitivesAddedEvent;
-import org.openstreetmap.josm.data.osm.event.PrimitivesRemovedEvent;
-import org.openstreetmap.josm.data.osm.event.RelationMembersChangedEvent;
-import org.openstreetmap.josm.data.osm.event.TagsChangedEvent;
-import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesObserver;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.gui.action.ActionQueue;
@@ -83,13 +71,11 @@ import org.openstreetmap.josm.plugins.notes.gui.action.CloseNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NotesAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NotesActionObserver;
 import org.openstreetmap.josm.plugins.notes.gui.action.PointToNewNoteAction;
-import org.openstreetmap.josm.plugins.notes.gui.action.PopupFactory;
 import org.openstreetmap.josm.plugins.notes.gui.action.ToggleConnectionModeAction;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
 import org.openstreetmap.josm.tools.Shortcut;
 
-public class NotesDialog extends ToggleDialog implements NotesObserver, ListSelectionListener, LayerChangeListener,
-DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
+public class NotesDialog extends ToggleDialog implements NotesObserver, ListSelectionListener, LayerChangeListener, MouseListener, NotesActionObserver {
 
     private static final long serialVersionUID = 1L;
     private JPanel bugListPanel, queuePanel;
@@ -233,12 +219,12 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
 
     @Override
     public void showNotify() {
-        DataSet.addSelectionListener(this);
+//        DataSet.addSelectionListener(this);
     }
 
     @Override
     public void hideNotify() {
-        DataSet.removeSelectionListener(this);
+//        DataSet.removeSelectionListener(this);
     }
 
     @Override
@@ -248,15 +234,13 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
 
     }
 
-    public synchronized void update(final DataSet dataset) {
+    public synchronized void update(final List<Note> dataset) {
         // create a new list model
         bugListModel = new DefaultListModel();
-        List<Node> sortedList = new ArrayList<Node>(dataset.getNodes());
+        List<Note> sortedList = new ArrayList<Note>(dataset);
         Collections.sort(sortedList, new BugComparator());
-        for (Node node : sortedList) {
-            if (node.isUsable()) {
-                bugListModel.addElement(new NotesListItem(node));
-            }
+        for (Note note : sortedList) {
+            bugListModel.addElement(new NotesListItem(note));
         }
         bugList.setModel(bugListModel);
     }
@@ -268,15 +252,16 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
             return;
         }
 
-        List<OsmPrimitive> selected = new ArrayList<OsmPrimitive>();
+        List<Note> selected = new ArrayList<Note>();
         for (Object listItem : bugList.getSelectedValues()) {
-            Node node = ((NotesListItem) listItem).getNode();
+            Note node = ((NotesListItem) listItem).getNote();
             selected.add(node);
 
-            if ("1".equals(node.get("state"))) {
+            switch(node.getState()) {
+            case closed:
                 addComment.setEnabled(false);
                 closeIssue.setEnabled(false);
-            } else {
+            case open:
                 addComment.setEnabled(true);
                 closeIssue.setEnabled(true);
             }
@@ -287,17 +272,16 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
         // CurrentDataSet may be null if there is no normal, edible map
         // If so, a temporary DataSet is created because it's the simplest way
         // to fire all necessary events so OSB updates its popups.
-        DataSet ds = osbPlugin.getLayer().getDataSet();
+        List<Note> ds = osbPlugin.getLayer().getDataSet();
         if (fireSelectionChanged) {
             if(ds == null)
-                ds = new DataSet();
-            ds.setSelected(selected);
+                ds = new ArrayList<Note>();
         }
     }
 
-    private void scrollToSelected(Node node) {
+    private void scrollToSelected(Note node) {
         for (int i = 0; i < bugListModel.getSize(); i++) {
-            Node current = ((NotesListItem) bugListModel.get(i)).getNode();
+            Note current = ((NotesListItem) bugListModel.get(i)).getNote();
             if (current.getId()== node.getId()) {
                 bugList.scrollRectToVisible(bugList.getCellBounds(i, i));
                 bugList.setSelectedIndex(i);
@@ -322,15 +306,15 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
         }
     }
 
-    public void zoomToNode(Node node) {
-        Main.map.mapView.zoomTo(node.getEastNorth());
+    public void zoomToNote(Note node) {
+        Main.map.mapView.zoomTo(node.getLatLon());
     }
 
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-            Node selectedNode = getSelectedNode();
+            Note selectedNode = getSelectedNote();
             if(selectedNode != null) {
-                zoomToNode(selectedNode);
+                zoomToNote(selectedNode);
             }
         }
     }
@@ -347,9 +331,10 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
         if (e.isPopupTrigger()) {
             int selectedRow = bugList.locationToIndex(e.getPoint());
             bugList.setSelectedIndex(selectedRow);
-            Node selectedNode = getSelectedNode();
-            if(selectedNode != null) {
-                PopupFactory.createPopup(selectedNode, this).show(e.getComponent(), e.getX(), e.getY());
+            Note selectedNote = getSelectedNote();
+            if(selectedNote != null) {
+                System.out.println("Note popup goes here for note ID " + selectedNote.getId());
+//                PopupFactory.createPopup(selectedNode, this).show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
@@ -366,13 +351,13 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
         }
     }
 
-    private static class BugComparator implements Comparator<Node> {
+    private static class BugComparator implements Comparator<Note> {
 
-        public int compare(Node o1, Node o2) {
-            String state1 = o1.get("state");
-            String state2 = o2.get("state");
+        public int compare(Note o1, Note o2) {
+            Note.State state1 = o1.getState();
+            Note.State state2 = o2.getState();
             if (state1.equals(state2)) {
-                return o1.get("note").compareTo(o2.get("note"));
+                return o1.getFirstComment().getText().compareTo(o2.getFirstComment().getText());
             }
             return state1.compareTo(state2);
         }
@@ -420,19 +405,19 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
         }
     }
 
-    public Node getSelectedNode() {
+    public Note getSelectedNote() {
         if(bugList.getSelectedValue() != null) {
-            return ((NotesListItem)bugList.getSelectedValue()).getNode();
+            return ((NotesListItem)bugList.getSelectedValue()).getNote();
         } else {
             return null;
         }
     }
 
-    public void setSelectedNode(Node node) {
-        if(node == null) {
+    public void setSelectedNode(Note note) {
+        if(note == null) {
             bugList.clearSelection();
         } else {
-            bugList.setSelectedValue(new NotesListItem(node), true);
+            bugList.setSelectedValue(new NotesListItem(note), true);
         }
     }
 
@@ -442,32 +427,14 @@ DataSetListener, SelectionChangedListener, MouseListener, NotesActionObserver {
         toggleConnectionMode.setSelected(offline);
     }
 
-    public void dataChanged(DataChangedEvent event) {
-        update(event.getDataset());
-    }
-
-    public void nodeMoved(NodeMovedEvent event) {}
-
-    public void otherDatasetChange(AbstractDatasetChangedEvent event) {}
-
-    public void primitivesAdded(PrimitivesAddedEvent event) {}
-
-    public void primitivesRemoved(PrimitivesRemovedEvent event) {}
-
-    public void relationMembersChanged(RelationMembersChangedEvent event) {}
-
-    public void tagsChanged(TagsChangedEvent event) {}
-
-    public void wayNodesChanged(WayNodesChangedEvent event) {}
-
-    public void selectionChanged(Collection<? extends OsmPrimitive> newSelection) {
-        if(newSelection.size() == 1 && newSelection.iterator().next() instanceof Node) {
-            Node selectedNode = (Node) newSelection.iterator().next();
+    public void selectionChanged(Collection<Note> newSelection) {
+        if(newSelection.size() == 1) {
+            Note selectedNote = newSelection.iterator().next();
             if(osbPlugin.getLayer() != null && osbPlugin.getLayer().getDataSet() != null
-                    && osbPlugin.getLayer().getDataSet().getNodes() != null
-                    && osbPlugin.getLayer().getDataSet().getNodes().contains(selectedNode))
+                    && osbPlugin.getLayer().getDataSet() != null
+                    && osbPlugin.getLayer().getDataSet().contains(selectedNote))
             {
-                setSelectedNode(selectedNode);
+                setSelectedNode(selectedNote);
             } else {
                 bugList.clearSelection();
             }

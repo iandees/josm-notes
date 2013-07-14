@@ -27,27 +27,27 @@
  */
 package org.openstreetmap.josm.plugins.notes.api;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import javax.swing.JOptionPane;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
+import org.xml.sax.SAXException;
 
 public class EditAction {
 
     private final String CHARSET = "UTF-8";
 
-    public void execute(Node n, String comment) throws IOException {
+    public void execute(Note n, String comment) throws IOException {
         // create the URI for the data download
         String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
         String post = new StringBuilder("id=")
-            .append(n.get("id"))
+            .append(n.getId())
             .append("&text=")
             .append(URLEncoder.encode(comment, CHARSET))
             .toString();
@@ -59,16 +59,14 @@ public class EditAction {
             result = HttpUtils.post(uri, post, CHARSET);
         }
 
-        if("ok".equalsIgnoreCase(result) || "comment added\n".equalsIgnoreCase(result)) {
-            String desc = n.get("note");
-            desc = desc.concat("<hr />").concat(comment);
-            n.put("note", desc);
+        try {
+            Note note = NotesXmlParser.parseNotes(result).get(0);
+            n.updateWith(note);
             Main.map.mapView.repaint();
-        } else {
-            JOptionPane.showMessageDialog(Main.parent,
-                    tr("An error occurred: {0}", new Object[] {result}),
-                    tr("Error"),
-                    JOptionPane.ERROR_MESSAGE);
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         }
     }
 }

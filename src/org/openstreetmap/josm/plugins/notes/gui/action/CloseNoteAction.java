@@ -35,9 +35,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.CloseAction;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
@@ -51,7 +51,7 @@ public class CloseNoteAction extends NotesAction {
 
     private String comment;
 
-    private Node node;
+    private Note note;
 
     public CloseNoteAction(NotesDialog dialog) {
         super(tr("Mark as done"), dialog);
@@ -65,7 +65,7 @@ public class CloseNoteAction extends NotesAction {
                 Main.pref.putCollection(ConfigKeys.NOTES_COMMENT_HISTORY, history);
             }
         };
-        node = dialog.getSelectedNode();
+        note = dialog.getSelectedNote();
         comment = TextInputDialog.showDialog(Main.map,
                 tr("Really close?"),
                 tr("<html>Really mark this note as ''done''?<br><br>You may add an optional comment:</html>"),
@@ -80,12 +80,12 @@ public class CloseNoteAction extends NotesAction {
 
     @Override
     public void execute() throws IOException {
-        closeAction.execute(node, comment);
+        closeAction.execute(note, comment);
     }
 
     @Override
     public String toString() {
-        return tr("Close: " + node.get("note") + " - Comment: " + comment);
+        return tr("Close: Note " + note.getId() + " - Comment: " + comment);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class CloseNoteAction extends NotesAction {
         CloseNoteAction action = new CloseNoteAction(dialog);
         action.canceled = canceled;
         action.comment = comment;
-        action.node = node;
+        action.note = note;
         return action;
     }
 }

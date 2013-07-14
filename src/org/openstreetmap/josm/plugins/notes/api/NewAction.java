@@ -27,25 +27,25 @@
  */
 package org.openstreetmap.josm.plugins.notes.api;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
 import java.awt.Point;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
+import org.xml.sax.SAXException;
 
 public class NewAction {
 
     private final String CHARSET = "UTF-8";
 
-    public Node execute(Point p, String text) throws IOException {
+    public Note execute(Point p, String text) throws IOException {
         // where has the issue been added
         LatLon latlon = Main.map.mapView.getLatLon(p.x, p.y);
 
@@ -67,20 +67,14 @@ public class NewAction {
             result = HttpUtils.post(uri, post, CHARSET);
         }
 
-        Pattern resultPattern = Pattern.compile("ok\\s+(\\d+)\\s*");
-        Matcher m = resultPattern.matcher(result);
-        String id = "-1";
-        if(m.matches()) {
-            id = m.group(1);
-        } else {
-            throw new RuntimeException(tr("Couldn''t create new bug. Result: {0}", result));
+        Note osmNote = null;
+        try {
+            osmNote = NotesXmlParser.parseNotes(result).get(0);
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         }
-
-        Node osmNode = new Node(latlon);
-        osmNode.put("id", id);
-        osmNode.put("note", text);
-        osmNode.put("openstreetbug", "FIXME");
-        osmNode.put("state", "0");
-        return osmNode;
+        return osmNote;
     }
 }

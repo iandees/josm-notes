@@ -35,9 +35,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.EditAction;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
@@ -51,7 +51,7 @@ public class AddCommentAction extends NotesAction {
 
     private String comment;
 
-    private Node node;
+    private Note note;
 
     public AddCommentAction(NotesDialog dialog) {
         super(tr("Add a comment"), dialog);
@@ -65,7 +65,7 @@ public class AddCommentAction extends NotesAction {
                 Main.pref.putCollection(ConfigKeys.NOTES_COMMENT_HISTORY, history);
             }
         };
-        node = dialog.getSelectedNode();
+        note = dialog.getSelectedNote();
         comment = TextInputDialog.showDialog(
                 Main.map,
                 tr("Add a comment"),
@@ -80,12 +80,12 @@ public class AddCommentAction extends NotesAction {
 
     @Override
     public void execute() throws IOException {
-        editAction.execute(node, comment);
+        editAction.execute(note, comment);
     }
 
     @Override
     public String toString() {
-        return tr("Comment: " + node.get("note") + " - " + comment);
+        return tr("Comment: Note " + note.getId() + " - " + comment);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class AddCommentAction extends NotesAction {
         AddCommentAction action = new AddCommentAction(dialog);
         action.comment = comment;
         action.canceled = canceled;
-        action.node = node;
+        action.note = note;
         return action;
     }
 }

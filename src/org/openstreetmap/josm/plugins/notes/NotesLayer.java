@@ -48,24 +48,19 @@ import javax.swing.JToolTip;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.RenameLayerAction;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.SelectionChangedListener;
-import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
-import org.openstreetmap.josm.plugins.notes.gui.action.PopupFactory;
 import org.openstreetmap.josm.tools.ColorHelper;
 
 public class NotesLayer extends Layer implements MouseListener {
 
-    private DataSet data;
+    private List<Note> data;
 
-    private Collection<? extends OsmPrimitive> selection;
+    private Collection<Note> selection;
 
     private JToolTip tooltip = new JToolTip();
 
@@ -74,15 +69,10 @@ public class NotesLayer extends Layer implements MouseListener {
 
     private NotesDialog dialog;
 
-    public NotesLayer(DataSet dataSet, String name, NotesDialog dialog) {
+    public NotesLayer(List<Note> dataSet, String name, NotesDialog dialog) {
         super(name);
         this.data = dataSet;
         this.dialog = dialog;
-        DataSet.addSelectionListener(new SelectionChangedListener() {
-            public void selectionChanged(Collection<? extends OsmPrimitive> newSelection) {
-                selection = newSelection;
-            }
-        });
 
         // if the map layer has been closed, while we are requesting the osb db,
         // the mapframe is null, so we check that, before installing the mouse listener
@@ -122,19 +112,21 @@ public class NotesLayer extends Layer implements MouseListener {
 
     @Override
     public void paint(Graphics2D g, MapView mv, Bounds bounds) {
-        Object[] nodes = data.getNodes().toArray();
         // This loop renders all the bug icons
-        for (int i = 0; i < nodes.length; i++) {
-            Node node = (Node) nodes[i];
-
+        for (Note note : data) {
             // don't paint deleted nodes
 
-            if(!node.isUsable())
-                continue;
+            Point p = mv.getPoint(note.getLatLon());
 
-            Point p = mv.getPoint(node);
-
-            ImageIcon icon = ("1".equals(node.get("state"))) ? iconValid : iconError;
+            ImageIcon icon = null;
+            switch(note.getState()) {
+                case closed:
+                    icon = iconError;
+                    break;
+                case open:
+                    icon = iconValid;
+                    break;
+            }
             int width = icon.getIconWidth();
             int height = icon.getIconHeight();
 
@@ -150,16 +142,22 @@ public class NotesLayer extends Layer implements MouseListener {
 
         // This loop renders the selection border and tooltips so they get drawn
         // on top of the bug icons
-        for (int i = 0; i < nodes.length; i++) {
-            Node node = (Node) nodes[i];
-
-            if(!node.isUsable() || !selection.contains(node))
+        for (Note note : data) {
+            if(!selection.contains(note))
                 continue;
 
             // draw selection border
-            Point p = mv.getPoint(node);
+            Point p = mv.getPoint(note.getLatLon());
 
-            ImageIcon icon = ("1".equals(node.get("state"))) ? iconValid : iconError;
+            ImageIcon icon = null;
+            switch(note.getState()) {
+                case closed:
+                    icon = iconError;
+                    break;
+                case open:
+                    icon = iconValid;
+                    break;
+            }
             int width = icon.getIconWidth();
             int height = icon.getIconHeight();
 
@@ -167,7 +165,7 @@ public class NotesLayer extends Layer implements MouseListener {
             g.drawRect(p.x-(width/2), p.y-(height/2), width-1, height-1);
 
             // draw description
-            String desc = node.get("note");
+            String desc = note.getFirstComment().getText();
             if(desc == null)
                 continue;
 
@@ -209,23 +207,21 @@ public class NotesLayer extends Layer implements MouseListener {
         return NotesPlugin.loadIcon("icon_error16.png");
     }
 
-    private Node getNearestNode(Point p) {
+    private Note getNearestNode(Point p) {
         double snapDistance = 10;
         double minDistanceSq = Double.MAX_VALUE;
-        Node minPrimitive = null;
-        for (Node n : data.getNodes()) {
-            if (!n.isUsable())
-                continue;
-            Point sp = Main.map.mapView.getPoint(n);
+        Note minPrimitive = null;
+        for (Note note : data) {
+            Point sp = Main.map.mapView.getPoint(note.getLatLon());
             double dist = p.distanceSq(sp);
             if (minDistanceSq > dist && p.distance(sp) < snapDistance) {
                 minDistanceSq = p.distanceSq(sp);
-                minPrimitive = n;
+                minPrimitive = note;
             }
             // prefer already selected node when multiple nodes on one point
-            else if(minDistanceSq == dist && data.isSelected(n) && !data.isSelected(minPrimitive))
+            else if(minDistanceSq == dist && selection.contains(note) && !selection.contains(minPrimitive))
             {
-                minPrimitive = n;
+                minPrimitive = note;
             }
         }
         return minPrimitive;
@@ -234,15 +230,15 @@ public class NotesLayer extends Layer implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1) {
             if(Main.map.mapView.getActiveLayer() == this) {
-                Node n = getNearestNode(e.getPoint());
-                if(n != null && data.getNodes().contains(n)) {
-                    List<OsmPrimitive> selected = new ArrayList<OsmPrimitive>();
+                Note n = getNearestNode(e.getPoint());
+                if(n != null && data.contains(n)) {
+                    List<Note> selected = new ArrayList<Note>();
                     selected.add(n);
-                    data.setSelected(selected);
+                    selection.addAll(selected);
                 } else {
-                    data.setSelected(new ArrayList<OsmPrimitive>());
+                    selection = new ArrayList<Note>();
                 }
-                data.fireSelectionChanged();
+                //fireSelectionChanged();
             }
         }
     }
@@ -258,9 +254,10 @@ public class NotesLayer extends Layer implements MouseListener {
     private void mayTriggerPopup(MouseEvent e) {
         if(e.isPopupTrigger()) {
             if(Main.map.mapView.getActiveLayer() == this) {
-                Node n = getNearestNode(e.getPoint());
-                if(n != null && data.getNodes().contains(n)) {
-                    PopupFactory.createPopup(n, dialog).show(e.getComponent(), e.getX(), e.getY());
+                Note n = getNearestNode(e.getPoint());
+                if(n != null && data.contains(n)) {
+                    System.out.println("Popup goes here?");
+                    //PopupFactory.createPopup(n, dialog).show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         }
@@ -270,7 +267,7 @@ public class NotesLayer extends Layer implements MouseListener {
 
     public void mouseExited(MouseEvent e) {}
 
-    public DataSet getDataSet() {
+    public List<Note> getDataSet() {
         return data;
     }
 }

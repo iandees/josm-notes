@@ -30,6 +30,7 @@ package org.openstreetmap.josm.plugins.notes.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.Iterator;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -37,7 +38,8 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
-import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.plugins.notes.Note.Comment;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
 public class NotesBugListCellRenderer implements ListCellRenderer {
@@ -64,19 +66,30 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
         }
 
         NotesListItem item = (NotesListItem) value;
-        Node n = item.getNode();
+        Note n = item.getNote();
+
         Icon icon = null;
-        if("0".equals(n.get("state"))) {
-            icon = NotesPlugin.loadIcon("icon_error16.png");
-        } else if("1".equals(n.get("state"))) {
-            icon = NotesPlugin.loadIcon("icon_valid16.png");
+        switch(n.getState()) {
+            case closed:
+                icon = NotesPlugin.loadIcon("icon_error16.png");
+                break;
+            case open:
+                icon = NotesPlugin.loadIcon("icon_valid16.png");
+                break;
         }
         label.setIcon(icon);
-        String text = n.get("note");
-        if(text.indexOf("<hr />") > 0) {
-            text = text.substring(0, text.indexOf("<hr />"));
+        StringBuilder text = new StringBuilder("<html>");
+        Iterator<Comment> iter = n.getComments().iterator();
+        while(iter.hasNext()) {
+            Comment comment = iter.next();
+            text.append(comment.getText());
+
+            if (iter.hasNext()) {
+                text.append("<hr/>");
+            }
         }
-        label.setText("<html>" + text + "</html>");
+        text.append("</html>");
+        label.setText(text.toString());
 
         Dimension d = label.getPreferredSize();
         d.height += 10;

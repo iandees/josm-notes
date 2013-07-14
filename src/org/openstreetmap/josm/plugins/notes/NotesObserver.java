@@ -27,8 +27,8 @@
  */
 package org.openstreetmap.josm.plugins.notes;
 
-import org.openstreetmap.josm.data.osm.DataSet;
+import java.util.List;
 
 public interface NotesObserver {
-    public void update(DataSet dataset);
+    public void update(List<Note> dataset);
 }

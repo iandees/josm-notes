@@ -27,42 +27,46 @@
  */
 package org.openstreetmap.josm.plugins.notes.gui;
 
-import org.openstreetmap.josm.data.osm.Node;
+import java.util.Iterator;
+
+import org.openstreetmap.josm.plugins.notes.Note;
+
 
 public class NotesListItem {
-    private Node node;
+    private Note note;
 
-    public NotesListItem(Node node) {
+    public NotesListItem(Note node) {
         super();
-        this.node = node;
+        this.note = node;
     }
 
-    public Node getNode() {
-        return node;
+    public Note getNote() {
+        return note;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
+    public void setNote(Note node) {
+        this.note = node;
     }
 
     @Override
     public String toString() {
-        if(node.get("note") != null) {
-            StringBuilder sb = new StringBuilder("<html>");
-            sb.append(node.get("note").replaceAll("\\|", "<br>"));
-            sb.append("</html>");
-            return sb.toString();
-        } else {
-            return "N/A";
+        StringBuilder sb = new StringBuilder("<html>");
+        Iterator<Note.Comment> iterator = getNote().getComments().iterator();
+        while(iterator.hasNext()) {
+            Note.Comment comment = iterator.next();
+            sb.append(comment.getText());
+            sb.append("<br/>");
         }
+        sb.append("</html>");
+        return sb.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof NotesListItem) {
             NotesListItem other = (NotesListItem)obj;
-            if(getNode() != null && other.getNode() != null) {
-                return getNode().getId() == other.getNode().getId();
+            if(getNote() != null && other.getNote() != null) {
+                return getNote().getId() == other.getNote().getId();
             }
         }
 

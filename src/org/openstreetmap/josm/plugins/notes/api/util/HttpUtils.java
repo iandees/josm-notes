@@ -38,6 +38,7 @@ import org.openstreetmap.josm.tools.Utils;
 
 public class HttpUtils {
     public static String get(String url, String charset) throws IOException {
+        System.out.println("Fetching GET " + url);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         int length = -1;
         byte[] b = new byte[1024];
@@ -59,6 +60,7 @@ public class HttpUtils {
      * @throws IOException
      */
     public static String post(String url, String content, String responseCharset) throws IOException {
+        System.out.println("Fetching POST " + url);
         // initialize the connection
         URL page = new URL(url);
         URLConnection con = page.openConnection();

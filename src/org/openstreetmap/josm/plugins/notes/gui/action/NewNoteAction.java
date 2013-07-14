@@ -36,9 +36,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.NewAction;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;
@@ -85,8 +85,8 @@ public class NewNoteAction extends NotesAction {
     @Override
     public void execute() throws IOException {
         if (result.length() > 0) {
-            Node n = newAction.execute(p, result);
-            plugin.getDataSet().addPrimitive(n);
+            Note n = newAction.execute(p, result);
+            plugin.getDataSet().add(n);
             if (Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
                 plugin.updateGui();
             } else {
