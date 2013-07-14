@@ -37,7 +37,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Action;
@@ -59,8 +58,7 @@ import org.openstreetmap.josm.tools.ColorHelper;
 public class NotesLayer extends Layer implements MouseListener {
 
     private List<Note> data;
-
-    private Collection<Note> selection;
+    private List<Note> selection = new ArrayList<Note>(1);
 
     private JToolTip tooltip = new JToolTip();
 
@@ -142,10 +140,7 @@ public class NotesLayer extends Layer implements MouseListener {
 
         // This loop renders the selection border and tooltips so they get drawn
         // on top of the bug icons
-        for (Note note : data) {
-            if(!selection.contains(note))
-                continue;
-
+        for (Note note : selection) {
             // draw selection border
             Point p = mv.getPoint(note.getLatLon());
 
@@ -165,18 +160,12 @@ public class NotesLayer extends Layer implements MouseListener {
             g.drawRect(p.x-(width/2), p.y-(height/2), width-1, height-1);
 
             // draw description
-            String desc = note.getFirstComment().getText();
-            if(desc == null)
-                continue;
-
-            // format with html
             StringBuilder sb = new StringBuilder("<html>");
-            sb.append(desc.replaceAll("<hr />", "<hr>"));
+            sb.append(note.getFirstComment().getText());
             sb.append("</html>");
-            desc = sb.toString();
 
             // draw description as a tooltip
-            tooltip.setTipText(desc);
+            tooltip.setTipText(sb.toString());
 
             int tx = p.x + (width / 2) + 5;
             int ty = (p.y - height / 2) -1;
@@ -232,13 +221,12 @@ public class NotesLayer extends Layer implements MouseListener {
             if(Main.map.mapView.getActiveLayer() == this) {
                 Note n = getNearestNode(e.getPoint());
                 if(n != null && data.contains(n)) {
-                    List<Note> selected = new ArrayList<Note>();
-                    selected.add(n);
-                    selection.addAll(selected);
+                    selection.add(n);
                 } else {
                     selection = new ArrayList<Note>();
                 }
-                //fireSelectionChanged();
+                dialog.setSelectedNote(n);
+                Main.map.mapView.repaint();
             }
         }
     }
@@ -269,5 +257,11 @@ public class NotesLayer extends Layer implements MouseListener {
 
     public List<Note> getDataSet() {
         return data;
+    }
+
+    public void replaceSelection(Note selected) {
+        selection.clear();
+        selection.add(selected);
+        Main.map.mapView.repaint();
     }
 }

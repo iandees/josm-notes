@@ -27,10 +27,11 @@
  */
 package org.openstreetmap.josm.plugins.notes.gui;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.Iterator;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -65,8 +66,7 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
             label.setForeground(UIManager.getColor("Label.disabledForeground"));
         }
 
-        NotesListItem item = (NotesListItem) value;
-        Note n = item.getNote();
+        Note n = (Note) value;
 
         Icon icon = null;
         switch(n.getState()) {
@@ -78,18 +78,17 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
                 break;
         }
         label.setIcon(icon);
-        StringBuilder text = new StringBuilder("<html>");
-        Iterator<Comment> iter = n.getComments().iterator();
-        while(iter.hasNext()) {
-            Comment comment = iter.next();
-            text.append(comment.getText());
 
-            if (iter.hasNext()) {
-                text.append("<hr/>");
-            }
-        }
-        text.append("</html>");
-        label.setText(text.toString());
+        StringBuilder sb = new StringBuilder();
+        Comment firstComment = n.getFirstComment();
+        sb.append(firstComment.getText());
+        sb.append(" (");
+        sb.append(firstComment.getUser().getName());
+        sb.append(tr("at"));
+        sb.append(" ");
+        sb.append(firstComment.getCreatedAt());
+        sb.append(")");
+        label.setText(sb.toString());
 
         Dimension d = label.getPreferredSize();
         d.height += 10;

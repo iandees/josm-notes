@@ -30,6 +30,7 @@ package org.openstreetmap.josm.plugins.notes;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -52,13 +53,14 @@ import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
- * Shows issues from OpenStreetBugs
+ * Shows notes from OpenStreetMap
  *
  * @author Henrik Niehaus (henrik dot niehaus at gmx dot de)
  */
 public class NotesPlugin extends Plugin implements LayerChangeListener {
 
-    private List<Note> dataSet = new ArrayList<Note>();
+    private List<Note> allNotes = new ArrayList<Note>();
+    private List<Note> selectedNotes = new ArrayList<Note>(1);
 
     private UploadHook uploadHook;
 
@@ -154,10 +156,10 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         if(!Main.pref.getBoolean(ConfigKeys.NOTES_API_OFFLINE)) {
             try {
                 // download the data
-                download.execute(dataSet, bounds);
+                download.execute(allNotes, bounds);
 
                 // display the parsed data
-                if(!dataSet.isEmpty() && dialog.isDialogShowing()) {
+                if(!allNotes.isEmpty() && dialog.isDialogShowing()) {
                     // if the map layer has been closed, while we are requesting the osb db,
                     // we don't have to update the gui, because the user is not interested
                     // in this area anymore
@@ -179,7 +181,7 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
 
 
         // restore node selection
-        dialog.setSelectedNode(selectedNote);
+        dialog.setSelectedNote(selectedNote);
 
         // enable the dialog
         try {
@@ -195,10 +197,10 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
 
     public void updateGui() {
         // update dialog
-        dialog.update(dataSet);
+        dialog.update(allNotes);
 
         // create a new layer if necessary
-        updateLayer(dataSet);
+        updateLayer(allNotes);
 
         // repaint view, so that changes get visible
         Main.map.mapView.repaint();
@@ -234,11 +236,16 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         return layer;
     }
 
-    public List<Note> getDataSet() {
-        return dataSet;
+    public Collection<Note> getDataSet() {
+        return allNotes;
+    }
+
+    public Collection<Note> getSelection() {
+        return selectedNotes;
     }
 
     public NotesDialog getDialog() {
         return dialog;
     }
+
 }

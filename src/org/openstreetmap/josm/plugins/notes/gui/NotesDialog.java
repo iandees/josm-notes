@@ -214,18 +214,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         closeIssueAction.addActionObserver(this);
         setConnectionMode(offline);
 
-
         MapView.addLayerChangeListener(this);
-    }
-
-    @Override
-    public void showNotify() {
-//        DataSet.addSelectionListener(this);
-    }
-
-    @Override
-    public void hideNotify() {
-//        DataSet.removeSelectionListener(this);
     }
 
     @Override
@@ -235,13 +224,13 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
     }
 
-    public synchronized void update(final List<Note> dataset) {
+    public synchronized void update(final Collection<Note> dataset) {
         // create a new list model
         bugListModel = new DefaultListModel();
         List<Note> sortedList = new ArrayList<Note>(dataset);
         Collections.sort(sortedList, new BugComparator());
         for (Note note : sortedList) {
-            bugListModel.addElement(new NotesListItem(note));
+            bugListModel.addElement(note);
         }
         bugList.setModel(bugListModel);
     }
@@ -255,10 +244,10 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
         List<Note> selected = new ArrayList<Note>();
         for (Object listItem : bugList.getSelectedValues()) {
-            Note node = ((NotesListItem) listItem).getNote();
-            selected.add(node);
+            Note note = (Note) listItem;
+            selected.add(note);
 
-            switch(node.getState()) {
+            switch(note.getState()) {
             case closed:
                 addComment.setEnabled(false);
                 closeIssue.setEnabled(false);
@@ -267,7 +256,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
                 closeIssue.setEnabled(true);
             }
 
-            scrollToSelected(node);
+            scrollToSelected(note);
         }
 
         // CurrentDataSet may be null if there is no normal, edible map
@@ -282,7 +271,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
     private void scrollToSelected(Note node) {
         for (int i = 0; i < bugListModel.getSize(); i++) {
-            Note current = ((NotesListItem) bugListModel.get(i)).getNote();
+            Note current = (Note) bugListModel.get(i);
             if (current.getId()== node.getId()) {
                 bugList.scrollRectToVisible(bugList.getCellBounds(i, i));
                 bugList.setSelectedIndex(i);
@@ -312,10 +301,13 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     }
 
     public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-            Note selectedNode = getSelectedNote();
-            if(selectedNode != null) {
-                zoomToNote(selectedNode);
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            Note selectedNote = getSelectedNote();
+            if(selectedNote != null) {
+                osbPlugin.getLayer().replaceSelection(selectedNote);
+                if (e.getClickCount() == 2) {
+                    zoomToNote(selectedNote);
+                }
             }
         }
     }
@@ -407,17 +399,17 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
     public Note getSelectedNote() {
         if(bugList.getSelectedValue() != null) {
-            return ((NotesListItem)bugList.getSelectedValue()).getNote();
+            return (Note) bugList.getSelectedValue();
         } else {
             return null;
         }
     }
 
-    public void setSelectedNode(Note note) {
+    public void setSelectedNote(Note note) {
         if(note == null) {
             bugList.clearSelection();
         } else {
-            bugList.setSelectedValue(new NotesListItem(note), true);
+            bugList.setSelectedValue(note, true);
         }
     }
 
@@ -434,7 +426,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
                     && osbPlugin.getLayer().getDataSet() != null
                     && osbPlugin.getLayer().getDataSet().contains(selectedNote))
             {
-                setSelectedNode(selectedNote);
+                setSelectedNote(selectedNote);
             } else {
                 bugList.clearSelection();
             }
