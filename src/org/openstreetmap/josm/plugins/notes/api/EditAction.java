@@ -45,10 +45,12 @@ public class EditAction {
 
     public void execute(Note n, String comment) throws IOException {
         // create the URI for the data download
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
-        String post = new StringBuilder("id=")
-            .append(n.getId())
-            .append("&text=")
+        String uri = new StringBuilder(Main.pref.get(ConfigKeys.NOTES_API_URI_BASE))
+        	.append("/")
+        	.append(n.getId())
+        	.append("/comment")
+        	.toString();
+        String post = new StringBuilder("text=")
             .append(URLEncoder.encode(comment, CHARSET))
             .toString();
 
