@@ -83,7 +83,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     private DefaultListModel bugListModel;
     private JList bugList;
     private JList queueList;
-    private NotesPlugin osbPlugin;
+    private NotesPlugin notesPlugin;
     private boolean fireSelectionChanged = true;
     private JButton refresh;
     private JButton addComment;
@@ -98,12 +98,12 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     private boolean buttonLabels = Main.pref.getBoolean(ConfigKeys.NOTES_BUTTON_LABELS);
 
     public NotesDialog(final NotesPlugin plugin) {
-        super(tr("Open OpenStreetBugs"), "icon_error24",
-                tr("Opens the OpenStreetBugs window and activates the automatic download"), Shortcut.registerShortcut(
-                        "view:openstreetbugs", tr("Toggle: {0}", tr("Open OpenStreetBugs")), KeyEvent.VK_B,
+        super(tr("OpenStreetMap Notes"), "icon_error24",
+                tr("Opens the OpenStreetMap Notes window and activates the automatic download"), Shortcut.registerShortcut(
+                        "view:osmnotes", tr("Toggle: {0}", tr("Open OpenStreetMap Notes")), KeyEvent.VK_B,
                         Shortcut.ALT_SHIFT), 150);
 
-        osbPlugin = plugin;
+        notesPlugin = plugin;
         bugListPanel = new JPanel(new BorderLayout());
         bugListPanel.setName(tr("Bug list"));
         add(bugListPanel, BorderLayout.CENTER);
@@ -128,7 +128,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
                 // check zoom level
                 if (zoom > 15 || zoom < 9) {
                     JOptionPane.showMessageDialog(Main.parent,
-                            tr("The visible area is either too small or too big to download data from OpenStreetBugs"),
+                            tr("The visible area is either too small or too big to download data from OpenStreetMap Notes"),
                             tr("Warning"), JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
@@ -137,7 +137,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
             }
         });
         bugListPanel.add(buttonPanel, BorderLayout.SOUTH);
-        Action toggleConnectionModeAction = new ToggleConnectionModeAction(this, osbPlugin);
+        Action toggleConnectionModeAction = new ToggleConnectionModeAction(this, notesPlugin);
         toggleConnectionMode = new JToggleButton(toggleConnectionModeAction);
         toggleConnectionMode.setToolTipText(ToggleConnectionModeAction.MSG_OFFLINE);
         boolean offline = Main.pref.getBoolean(ConfigKeys.NOTES_API_OFFLINE);
@@ -160,7 +160,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         closeIssue.setEnabled(false);
         closeIssue.setToolTipText((String) closeIssue.getAction().getValue(Action.NAME));
         closeIssue.setIcon(NotesPlugin.loadIcon("icon_valid22.png"));
-        PointToNewNoteAction nia = new PointToNewNoteAction(newIssue, osbPlugin);
+        PointToNewNoteAction nia = new PointToNewNoteAction(newIssue, notesPlugin);
         newIssue.setAction(nia);
         newIssue.setToolTipText((String) newIssue.getAction().getValue(Action.NAME));
         newIssue.setIcon(NotesPlugin.loadIcon("icon_error_add22.png"));
@@ -262,7 +262,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         // CurrentDataSet may be null if there is no normal, edible map
         // If so, a temporary DataSet is created because it's the simplest way
         // to fire all necessary events so OSB updates its popups.
-        List<Note> ds = osbPlugin.getLayer().getDataSet();
+        List<Note> ds = notesPlugin.getLayer().getDataSet();
         if (fireSelectionChanged) {
             if(ds == null)
                 ds = new ArrayList<Note>();
@@ -284,14 +284,14 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     }
 
     public void layerAdded(Layer newLayer) {
-        if (newLayer == osbPlugin.getLayer()) {
-            update(osbPlugin.getDataSet());
+        if (newLayer == notesPlugin.getLayer()) {
+            update(notesPlugin.getDataSet());
             Main.map.mapView.moveLayer(newLayer, 0);
         }
     }
 
     public void layerRemoved(Layer oldLayer) {
-        if (oldLayer == osbPlugin.getLayer()) {
+        if (oldLayer == notesPlugin.getLayer()) {
             bugListModel.removeAllElements();
         }
     }
@@ -304,7 +304,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         if (e.getButton() == MouseEvent.BUTTON1) {
             Note selectedNote = getSelectedNote();
             if(selectedNote != null) {
-                osbPlugin.getLayer().replaceSelection(selectedNote);
+                notesPlugin.getLayer().replaceSelection(selectedNote);
                 if (e.getClickCount() == 2) {
                     zoomToNote(selectedNote);
                 }
@@ -339,7 +339,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
     public void actionPerformed(NotesAction action) {
         if (action instanceof AddCommentAction || action instanceof CloseNoteAction) {
-            update(osbPlugin.getDataSet());
+            update(notesPlugin.getDataSet());
         }
     }
 
@@ -360,7 +360,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     protected void initialDownload() {
         Main.worker.execute(new Runnable() {
             public void run() {
-                osbPlugin.updateData();
+                notesPlugin.updateData();
             }
         });
     }
@@ -415,16 +415,16 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
     public void setConnectionMode(boolean offline) {
         refresh.setEnabled(!offline);
-        setTitle(tr("OpenStreetBugs ({0})", (offline ? tr("offline") : tr("online"))));
+        setTitle(tr("OpenStreetMap Notes ({0})", (offline ? tr("offline") : tr("online"))));
         toggleConnectionMode.setSelected(offline);
     }
 
     public void selectionChanged(Collection<Note> newSelection) {
         if(newSelection.size() == 1) {
             Note selectedNote = newSelection.iterator().next();
-            if(osbPlugin.getLayer() != null && osbPlugin.getLayer().getDataSet() != null
-                    && osbPlugin.getLayer().getDataSet() != null
-                    && osbPlugin.getLayer().getDataSet().contains(selectedNote))
+            if(notesPlugin.getLayer() != null && notesPlugin.getLayer().getDataSet() != null
+                    && notesPlugin.getLayer().getDataSet() != null
+                    && notesPlugin.getLayer().getDataSet().contains(selectedNote))
             {
                 setSelectedNote(selectedNote);
             } else {
