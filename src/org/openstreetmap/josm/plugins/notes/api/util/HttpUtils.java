@@ -62,7 +62,8 @@ public class HttpUtils {
      * @throws IOException
      */
     public static String post(String url, String content, String responseCharset) {
-    	try {
+    	return "ok";
+ /*   	try {
     		System.out.println("Fetching POST " + url);
     		// initialize the connection
 
@@ -99,6 +100,6 @@ public class HttpUtils {
     	catch(Exception e) {
     		e.printStackTrace();
     		return e.getMessage();
-    	}
+    	}*/
     }
 }
