@@ -84,7 +84,7 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
         sb.append(firstComment.getText());
         sb.append(" (");
         sb.append(firstComment.getUser().getName());
-        sb.append(tr("at"));
+        sb.append(tr(" at"));
         sb.append(" ");
         sb.append(firstComment.getCreatedAt());
         sb.append(")");
