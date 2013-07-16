@@ -34,43 +34,23 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
+import org.openstreetmap.josm.plugins.notes.api.util.NoteConnection;
 
 public class CloseAction {
 
-    private final String CHARSET = "UTF-8";
-
     public void execute(Note n, String closeMsg) throws IOException {
-        // create the URI for the note close
-        String uri = new StringBuilder(Main.pref.get(ConfigKeys.NOTES_API_URI_BASE))
-            .append("/")
-            .append(n.getId())
-            .append("/close")
-            .toString();
-        String post = "";
-        if (closeMsg != null) {
-            post = new StringBuilder("text=")
-                .append(closeMsg)
-                .toString();
-        }
-
-        String result = null;
-        if(Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
-            result = "ok";
-        } else {
-            result = HttpUtils.post(uri, post, CHARSET);
-        }
-
-        if("ok".equalsIgnoreCase(result.trim())) {
-            n.setState(Note.State.closed);
-            Main.map.mapView.repaint();
-        } else {
-            JOptionPane.showMessageDialog(Main.parent,
-                    tr("An error occurred: {0}", new Object[] {result}),
-                    tr("Error"),
-                    JOptionPane.ERROR_MESSAGE);
-        }
+    	try {
+    		NoteConnection.getNoteConnection().closeNote(n, closeMsg);
+    		n.setState(Note.State.closed);
+    		Main.map.mapView.repaint();
+    	}
+    	catch(OsmTransferException e) {
+    		JOptionPane.showMessageDialog(Main.parent, 
+    				tr("An error occurred: {0}", new Object[] {e.getMessage()}), 
+    				tr("Error"), 
+    				JOptionPane.ERROR_MESSAGE);
+    	}
     }
 }
