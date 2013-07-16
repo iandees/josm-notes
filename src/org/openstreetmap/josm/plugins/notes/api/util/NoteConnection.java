@@ -15,7 +15,10 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.io.ChangesetClosedException;
@@ -26,7 +29,9 @@ import org.openstreetmap.josm.io.OsmConnection;
 import org.openstreetmap.josm.io.OsmTransferCanceledException;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.tools.Utils;
+import org.xml.sax.SAXException;
 
 public class NoteConnection extends OsmConnection {
 	
@@ -46,6 +51,54 @@ public class NoteConnection extends OsmConnection {
 		}
 		
 		sendRequest("POST", urlBuilder.toString(), null, monitor, true, false);
+	}
+	
+	public Note createNote(LatLon latlon, String text) throws OsmTransferException {
+		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		String url = new StringBuilder()
+			.append("note?lat=")
+			.append(latlon.lat())
+			.append("&lon=")
+			.append(latlon.lon())
+			.append("&text=")
+			.append(text).toString();
+		
+		String response = sendRequest("POST", url, null, monitor, true, false);
+		Note osmNote = null;
+        try {
+            osmNote = NotesXmlParser.parseNotes(response).get(0);
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+        	e.printStackTrace();
+        }
+        return osmNote;
+	}
+	
+	public Note AddCommentToNote(Note note, String comment) throws OsmTransferException {
+		if(comment == null || comment.trim().isEmpty()) {
+			return note;
+		}
+		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		String url = new StringBuilder()
+			.append("notes/")
+			.append(note.getId())
+			.append("/comment?text=")
+			.append(comment).toString();
+		
+		String response = sendRequest("POST", url, null, monitor, true, false);
+        try {
+            return NotesXmlParser.parseNotes(response).get(0);
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+        	e.printStackTrace();
+        }
+        return note;
 	}
 	
 	/**

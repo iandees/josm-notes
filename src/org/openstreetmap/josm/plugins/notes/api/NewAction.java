@@ -29,52 +29,27 @@ package org.openstreetmap.josm.plugins.notes.api;
 
 import java.awt.Point;
 import java.io.IOException;
-import java.net.URLEncoder;
 
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
-import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
-import org.xml.sax.SAXException;
+import org.openstreetmap.josm.plugins.notes.api.util.NoteConnection;
 
 public class NewAction {
 
-    private final String CHARSET = "UTF-8";
 
     public Note execute(Point p, String text) throws IOException {
         // where has the issue been added
         LatLon latlon = Main.map.mapView.getLatLon(p.x, p.y);
-
-        // create the URI for the data download
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
-
-        String post = new StringBuilder("lon=")
-            .append(latlon.lon())
-            .append("&lat=")
-            .append(latlon.lat())
-            .append("&text=")
-            .append(URLEncoder.encode(text, CHARSET))
-            .toString();
-
-        String result = null;
-        if(Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
-            result = "ok 12345";
-        } else {
-            result = HttpUtils.post(uri, post, CHARSET);
-        }
-
-        Note osmNote = null;
+        
         try {
-            osmNote = NotesXmlParser.parseNotes(result).get(0);
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+        	return NoteConnection.getNoteConnection().createNote(latlon, text);
         }
-        return osmNote;
+        catch(OsmTransferException e) {
+        	e.printStackTrace();
+        }
+        return null;
     }
 }
