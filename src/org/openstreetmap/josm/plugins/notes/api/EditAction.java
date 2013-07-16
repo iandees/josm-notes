@@ -28,47 +28,28 @@
 package org.openstreetmap.josm.plugins.notes.api;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
-import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
-import org.xml.sax.SAXException;
+import org.openstreetmap.josm.plugins.notes.api.util.NoteConnection;
 
 public class EditAction {
 
-    private final String CHARSET = "UTF-8";
-
     public void execute(Note n, String comment) throws IOException {
-        // create the URI for the data download
-        String uri = new StringBuilder(Main.pref.get(ConfigKeys.NOTES_API_URI_BASE))
-        	.append("/")
-        	.append(n.getId())
-        	.append("/comment")
-        	.toString();
-        String post = new StringBuilder("text=")
-            .append(URLEncoder.encode(comment, CHARSET))
-            .toString();
-
-        String result = null;
-        if(Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
-            result = "ok";
-        } else {
-            result = HttpUtils.post(uri, post, CHARSET);
+    	
+    	Note newNote = null;
+    	try {
+        	newNote = NoteConnection.getNoteConnection().AddCommentToNote(n, comment);
         }
-
-        try {
-            Note note = NotesXmlParser.parseNotes(result).get(0);
-            n.updateWith(note);
+        catch(OsmTransferException e) {
+        	e.printStackTrace();
+        }
+    	
+    	if (newNote != null) {
+    		n.updateWith(newNote);
             Main.map.mapView.repaint();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
+    	}
     }
 }
