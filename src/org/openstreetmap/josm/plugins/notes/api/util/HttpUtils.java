@@ -30,11 +30,7 @@ package org.openstreetmap.josm.plugins.notes.api.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Map;
 
 import org.openstreetmap.josm.tools.Utils;
 
@@ -51,55 +47,5 @@ public class HttpUtils {
         Utils.close(in);
 
         return new String(bos.toByteArray(), charset);
-    }
-
-    /**
-     *
-     * @param url
-     * @param content the post body
-     * @param responseCharset the expected charset of the response
-     * @return
-     * @throws IOException
-     */
-    public static String post(String url, String content, String responseCharset) {
-    	return "ok";
- /*   	try {
-    		System.out.println("Fetching POST " + url);
-    		// initialize the connection
-
-    		URL page = new URL(url);
-    		HttpURLConnection connection = Utils.openHttpConnection(page);
-
-    		NoteConnection noteConnection = new NoteConnection();
-
-    		noteConnection.addAuth(connection);
-    		connection.setDoOutput(true);
-    		connection.connect();
-
-    		//send the post
-    		OutputStream os = connection.getOutputStream();
-    		os.write(content.getBytes("UTF-8"));
-    		os.flush();
-
-    		// read the response
-    		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    		int length = -1;
-    		byte[] b = new byte[1024];
-    		InputStream in = connection.getInputStream();
-    		while( (length = in.read(b)) > 0 ) {
-    			bos.write(b, 0, length);
-    		}
-    		Utils.close(in);
-    		Utils.close(os);
-
-    		if(connection.getResponseCode() == 200) {
-    			return "ok";
-    		}
-    		return new String(bos.toByteArray(), responseCharset);
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    		return e.getMessage();
-    	}*/
     }
 }
