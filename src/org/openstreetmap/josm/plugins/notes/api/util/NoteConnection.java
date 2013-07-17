@@ -75,7 +75,7 @@ public class NoteConnection extends OsmConnection {
 	public Note createNote(LatLon latlon, String text) throws OsmTransferException {
 		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
 		String url = new StringBuilder()
-			.append("note?lat=")
+			.append("notes?lat=")
 			.append(latlon.lat())
 			.append("&lon=")
 			.append(latlon.lon())
