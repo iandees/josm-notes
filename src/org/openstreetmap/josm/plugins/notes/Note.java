@@ -15,6 +15,7 @@ public class Note {
     private LatLon latLon;
     private Date createdAt;
     private State state;
+    private String noteUrl;
     private List<Note.Comment> comments = new ArrayList<Note.Comment>();
 
     public class Comment {
@@ -63,6 +64,10 @@ public class Note {
     public List<Note.Comment> getComments() {
         return comments;
     }
+    
+    public String getNoteUrl() {
+    	return noteUrl;
+    }
 
     public void setState(State state) {
         this.state = state;
@@ -74,6 +79,10 @@ public class Note {
 
     public void setId(long id) {
         this.id = id;
+    }
+    
+    public void setNoteUrl(String url) {
+    	this.noteUrl = url;
     }
 
     public void addComment(Note.Comment comment) {
@@ -90,6 +99,7 @@ public class Note {
         this.id = note.id;
         this.state = note.state;
         this.latLon = note.latLon;
+        this.noteUrl = note.noteUrl;
     }
 
 }

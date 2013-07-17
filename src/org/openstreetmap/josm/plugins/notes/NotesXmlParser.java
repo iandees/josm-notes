@@ -46,6 +46,8 @@ public class NotesXmlParser extends DefaultHandler {
             thisNote.setId(Long.parseLong(chars));
         } else if ("status".equals(qName)) {
             thisNote.setState(Note.State.valueOf(chars));
+        } else if ("url".equals(qName)) {
+        	thisNote.setNoteUrl(chars);
         } else if ("date_created".equals(qName)) {
             // Note create date
             try {
