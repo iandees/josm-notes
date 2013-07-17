@@ -54,17 +54,7 @@ public class NoteConnection extends OsmConnection {
             .append(",").append(bounds.getMax().lat())
             .toString();
 		String response = sendRequest("GET", url, null, monitor, false, true);
-		List<Note> notes = new ArrayList<Note>();
-        try {
-            notes = NotesXmlParser.parseNotes(response);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return notes;
+		return parseNotes(response);
 	}
 	
 	
@@ -93,17 +83,11 @@ public class NoteConnection extends OsmConnection {
 			.append(text).toString();
 		
 		String response = sendRequest("POST", url, null, monitor, true, false);
-		Note osmNote = null;
-        try {
-            osmNote = NotesXmlParser.parseNotes(response).get(0);
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-        	e.printStackTrace();
-        }
-        return osmNote;
+		List<Note> newNote = parseNotes(response);
+		if(newNote.size() != 0) {
+			return newNote.get(0);
+		}
+		return null;
 	}
 	
 	public Note AddCommentToNote(Note note, String comment) throws OsmTransferException {
@@ -118,8 +102,16 @@ public class NoteConnection extends OsmConnection {
 			.append(comment).toString();
 		
 		String response = sendRequest("POST", url, null, monitor, true, false);
-        try {
-            return NotesXmlParser.parseNotes(response).get(0);
+		List<Note> modifiedNote = parseNotes(response);
+		if(modifiedNote.size() !=0) {
+			return modifiedNote.get(0);
+		}
+        return note;
+	}
+	
+	private List<Note> parseNotes(String notesXml) {
+		try {
+            return NotesXmlParser.parseNotes(notesXml);
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
@@ -127,7 +119,8 @@ public class NoteConnection extends OsmConnection {
         } catch (IOException e) {
         	e.printStackTrace();
         }
-        return note;
+		return new ArrayList<Note>();
+		
 	}
 	
 	/**
