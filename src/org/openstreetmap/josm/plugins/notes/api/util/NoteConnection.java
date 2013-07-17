@@ -15,6 +15,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,7 +41,7 @@ public class NoteConnection extends OsmConnection {
 	
 	private static String version = "0.6";
 	private String serverUrl;
-	private static NoteConnection instance;
+	private static HashMap<String, NoteConnection> instances = new HashMap<String, NoteConnection>();
 	
 	
 	public List<Note> getNotesInBoundingBox(Bounds bounds) throws OsmTransferException {
@@ -135,10 +136,12 @@ public class NoteConnection extends OsmConnection {
 	}
 	
     static public NoteConnection getNoteConnection(String serverUrl) {
-    	if(instance == null) {
-    		instance = new NoteConnection(serverUrl);
+    	NoteConnection connection = instances.get(serverUrl);
+    	if (connection == null) {
+    		connection = new NoteConnection(serverUrl);
+    		instances.put(serverUrl, connection);
     	}
-    	return instance;
+    	return connection;
     }
 	
 	public static NoteConnection getNoteConnection() {
