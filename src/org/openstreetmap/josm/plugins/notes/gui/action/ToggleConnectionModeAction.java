@@ -14,8 +14,9 @@ import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 
 public class ToggleConnectionModeAction extends AbstractAction {
-
-    private final NotesPlugin plugin;
+	private static final long serialVersionUID = 1L;
+	
+	private final NotesPlugin plugin;
     private final NotesDialog dialog;
     private final ActionQueue actionQueue;
 

@@ -43,12 +43,12 @@ import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.Note.Comment;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
-public class NotesBugListCellRenderer implements ListCellRenderer {
+public class NotesBugListCellRenderer implements ListCellRenderer<Note> {
 
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
-
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+	
+    public Component getListCellRendererComponent(JList<? extends Note> list, Note note, int index, boolean isSelected,
             boolean cellHasFocus) {
 
         JLabel label = new JLabel();
@@ -66,10 +66,8 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
             label.setForeground(UIManager.getColor("Label.disabledForeground"));
         }
 
-        Note n = (Note) value;
-
         Icon icon = null;
-        switch(n.getState()) {
+        switch(note.getState()) {
             case closed:
                 icon = NotesPlugin.loadIcon("icon_valid16.png");
                 break;
@@ -80,7 +78,7 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
         label.setIcon(icon);
 
         StringBuilder sb = new StringBuilder();
-        Comment firstComment = n.getFirstComment();
+        Comment firstComment = note.getFirstComment();
         sb.append(firstComment.getText());
         sb.append(" (");
         sb.append(firstComment.getUser().getName());
@@ -97,5 +95,7 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
         label.setEnabled(list.isEnabled());
         return label;
     }
+
+
 
 }

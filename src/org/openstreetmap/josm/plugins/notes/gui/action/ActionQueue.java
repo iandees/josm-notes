@@ -4,9 +4,11 @@ import java.util.LinkedList;
 
 import javax.swing.AbstractListModel;
 
-public class ActionQueue extends AbstractListModel {
+public class ActionQueue extends AbstractListModel<NotesAction> {
 
-    private LinkedList<NotesAction> queue = new LinkedList<NotesAction>();
+	private static final long serialVersionUID = 1L;
+	
+	private LinkedList<NotesAction> queue = new LinkedList<NotesAction>();
 
     public boolean offer(NotesAction e) {
         boolean result = queue.offer(e);
@@ -51,7 +53,7 @@ public class ActionQueue extends AbstractListModel {
         }
     }
 
-    public Object getElementAt(int index) {
+    public NotesAction getElementAt(int index) {
         return queue.get(index);
     }
 

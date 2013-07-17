@@ -67,7 +67,9 @@ import org.openstreetmap.josm.gui.widgets.HistoryComboBox;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class TextInputDialog extends JDialog {
-    private JLabel lblIcon;
+	private static final long serialVersionUID = 1L;
+	
+	private JLabel lblIcon;
     private JButton btnCancel;
     private JButton btnOk;
     private JPanel pnlButtons;

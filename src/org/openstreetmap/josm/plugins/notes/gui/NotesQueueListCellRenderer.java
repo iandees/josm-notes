@@ -43,12 +43,12 @@ import org.openstreetmap.josm.plugins.notes.gui.action.CloseNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NewNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NotesAction;
 
-public class NotesQueueListCellRenderer implements ListCellRenderer {
+public class NotesQueueListCellRenderer implements ListCellRenderer<NotesAction> {
 
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
 
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+    public Component getListCellRendererComponent(JList<? extends NotesAction> list, NotesAction action, int index, boolean isSelected,
             boolean cellHasFocus) {
 
         JLabel label = new JLabel();
@@ -62,7 +62,6 @@ public class NotesQueueListCellRenderer implements ListCellRenderer {
             label.setBackground(index % 2 == 0 ? background : altBackground);
         }
 
-        NotesAction action = (NotesAction) value;
         Icon icon = null;
         if(action instanceof NewNoteAction) {
             icon = NotesPlugin.loadIcon("icon_error_add16.png");
