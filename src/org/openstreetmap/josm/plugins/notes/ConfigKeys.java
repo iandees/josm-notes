@@ -29,7 +29,6 @@ package org.openstreetmap.josm.plugins.notes;
 
 public class ConfigKeys {
     public static final String NOTES_API_DISABLED = "notes.api.disabled";
-    public static final String NOTES_API_URI_BASE = "notes.uri.base";
     public static final String NOTES_AUTO_DOWNLOAD = "notes.auto_download";
     public static final String NOTES_BUTTON_LABELS = "notes.button_labels";
     public static final String NOTES_COMMENT_HISTORY = "notes.comment.history";

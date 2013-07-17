@@ -100,12 +100,6 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
             Main.pref.put(ConfigKeys.NOTES_API_DISABLED, debug);
         }
 
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
-        if(uri == null || uri.length() == 0) {
-            uri = "http://api.openstreetmap.org/api/0.6/notes";
-            Main.pref.put(ConfigKeys.NOTES_API_URI_BASE, uri);
-        }
-
         String auto_download = Main.pref.get(ConfigKeys.NOTES_AUTO_DOWNLOAD);
         if(auto_download == null || auto_download.length() == 0) {
             auto_download = "true";

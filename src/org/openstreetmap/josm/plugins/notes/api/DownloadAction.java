@@ -35,7 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.plugins.notes.ConfigKeys;
+import org.openstreetmap.josm.io.OsmApi;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
@@ -48,7 +48,7 @@ public class DownloadAction {
 
     public void execute(List<Note> dataset, Bounds bounds) throws IOException {
         // create the URI for the data download
-        String uri = Main.pref.get(ConfigKeys.NOTES_API_URI_BASE);
+        String uri = Main.pref.get("osm-server.url", OsmApi.DEFAULT_API_URL) + "/0.6/notes";
 
         int zoom = OsmUrlToBounds.getZoom(Main.map.mapView.getRealBounds());
         // check zoom level
