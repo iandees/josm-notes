@@ -28,27 +28,18 @@
 package org.openstreetmap.josm.plugins.notes.api;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.io.OsmApi;
+import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
-import org.openstreetmap.josm.plugins.notes.api.util.HttpUtils;
+import org.openstreetmap.josm.plugins.notes.api.util.NoteConnection;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
-import org.xml.sax.SAXException;
 
 public class DownloadAction {
 
-    private final String CHARSET = "UTF-8";
-
     public void execute(List<Note> dataset, Bounds bounds) throws IOException {
-        // create the URI for the data download
-        String uri = Main.pref.get("osm-server.url", OsmApi.DEFAULT_API_URL) + "/0.6/notes";
 
         int zoom = OsmUrlToBounds.getZoom(Main.map.mapView.getRealBounds());
         // check zoom level
@@ -56,37 +47,14 @@ public class DownloadAction {
             return;
         }
 
-        // add query params to the uri
-        StringBuilder sb = new StringBuilder(uri)
-            .append("?bbox=").append(bounds.getMin().lon())
-            .append(",").append(bounds.getMin().lat())
-            .append(",").append(bounds.getMax().lon())
-            .append(",").append(bounds.getMax().lat());
-        uri = sb.toString();
-
-        // download the data
-        String content = HttpUtils.get(uri, CHARSET);
-
-        // clear dataset
-        dataset.clear();
-
-        // parse the data
-        parseData(dataset, content);
-    }
-
-    private void parseData(List<Note> dataSet, String content) {
-        List<Note> notes = new ArrayList<Note>();
         try {
-            notes = NotesXmlParser.parseNotes(content);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        	List<Note> notes = NoteConnection.getNoteConnection().getNotesInBoundingBox(bounds);
+            dataset.clear();
+            dataset.addAll(notes);
         }
-
-        dataSet.clear();
-        dataSet.addAll(notes);
+        catch(OsmTransferException e) {
+        	e.printStackTrace();
+        	return;
+        }
     }
 }

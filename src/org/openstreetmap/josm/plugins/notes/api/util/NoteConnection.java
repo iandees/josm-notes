@@ -14,6 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -31,6 +33,7 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
 import org.openstreetmap.josm.tools.Utils;
+import org.openstreetmap.josm.data.Bounds;
 import org.xml.sax.SAXException;
 
 public class NoteConnection extends OsmConnection {
@@ -38,6 +41,32 @@ public class NoteConnection extends OsmConnection {
 	private static String version = "0.6";
 	private String serverUrl;
 	private static NoteConnection instance;
+	
+	
+	public List<Note> getNotesInBoundingBox(Bounds bounds) throws OsmTransferException {
+		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		
+		String url = new StringBuilder()
+			.append("notes?bbox=")
+			.append(bounds.getMin().lon())
+			.append(",").append(bounds.getMin().lat())
+            .append(",").append(bounds.getMax().lon())
+            .append(",").append(bounds.getMax().lat())
+            .toString();
+		String response = sendRequest("GET", url, null, monitor, false, true);
+		List<Note> notes = new ArrayList<Note>();
+        try {
+            notes = NotesXmlParser.parseNotes(response);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return notes;
+	}
+	
 	
 	public void closeNote(Note note, String closeMessage) throws OsmTransferException {
 		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
