@@ -9,10 +9,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,13 +63,20 @@ public class NoteConnection extends OsmConnection {
 	
 	public void closeNote(Note note, String closeMessage) throws OsmTransferException {
 		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		String encodedMessage;
+		try {
+			encodedMessage = URLEncoder.encode(closeMessage, "UTF-8");
+		} catch(UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return;
+		}
 		StringBuilder urlBuilder = new StringBuilder()
 			.append("notes/")
 			.append(note.getId())
 			.append("/close");
-		if(closeMessage != null && !closeMessage.trim().isEmpty()) {
+		if(encodedMessage != null && !encodedMessage.trim().isEmpty()) {
 			urlBuilder.append("?text=");
-			urlBuilder.append(closeMessage);
+			urlBuilder.append(encodedMessage);
 		}
 		
 		sendRequest("POST", urlBuilder.toString(), null, monitor, true, false);
@@ -75,13 +84,21 @@ public class NoteConnection extends OsmConnection {
 	
 	public Note createNote(LatLon latlon, String text) throws OsmTransferException {
 		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		String encodedText;
+		try {
+			encodedText = URLEncoder.encode(text, "UTF-8");
+		}
+		catch(UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 		String url = new StringBuilder()
 			.append("notes?lat=")
 			.append(latlon.lat())
 			.append("&lon=")
 			.append(latlon.lon())
 			.append("&text=")
-			.append(text).toString();
+			.append(encodedText).toString();
 		
 		String response = sendRequest("POST", url, null, monitor, true, false);
 		List<Note> newNote = parseNotes(response);
@@ -96,11 +113,18 @@ public class NoteConnection extends OsmConnection {
 			return note;
 		}
 		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		String encodedComment;
+		try {
+			encodedComment = URLEncoder.encode(comment, "UTF-8");
+		} catch(UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return note;
+		}
 		String url = new StringBuilder()
 			.append("notes/")
 			.append(note.getId())
 			.append("/comment?text=")
-			.append(comment).toString();
+			.append(encodedComment).toString();
 		
 		String response = sendRequest("POST", url, null, monitor, true, false);
 		List<Note> modifiedNote = parseNotes(response);
