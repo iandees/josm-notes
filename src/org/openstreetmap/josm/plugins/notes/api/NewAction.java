@@ -35,7 +35,7 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.api.util.NoteConnection;
+import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
 
 public class NewAction {
 
@@ -45,7 +45,7 @@ public class NewAction {
         LatLon latlon = Main.map.mapView.getLatLon(p.x, p.y);
         
         try {
-        	return NoteConnection.getNoteConnection().createNote(latlon, text);
+        	return NotesApi.getNotesApi().createNote(latlon, text);
         }
         catch(OsmTransferException e) {
         	e.printStackTrace();

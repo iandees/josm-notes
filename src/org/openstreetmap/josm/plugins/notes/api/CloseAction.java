@@ -36,13 +36,13 @@ import javax.swing.JOptionPane;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.api.util.NoteConnection;
+import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
 
 public class CloseAction {
 
     public void execute(Note n, String closeMsg) throws IOException {
     	try {
-    		NoteConnection.getNoteConnection().closeNote(n, closeMsg);
+    		NotesApi.getNotesApi().closeNote(n, closeMsg);
     		n.setState(Note.State.closed);
     		Main.map.mapView.repaint();
     	}

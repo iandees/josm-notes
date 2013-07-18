@@ -39,11 +39,11 @@ import org.openstreetmap.josm.tools.Utils;
 import org.openstreetmap.josm.data.Bounds;
 import org.xml.sax.SAXException;
 
-public class NoteConnection extends OsmConnection {
+public class NotesApi extends OsmConnection {
 	
 	private static String version = "0.6";
 	private String serverUrl;
-	private static HashMap<String, NoteConnection> instances = new HashMap<String, NoteConnection>();
+	private static HashMap<String, NotesApi> instances = new HashMap<String, NotesApi>();
 	
 	
 	public List<Note> getNotesInBoundingBox(Bounds bounds) throws OsmTransferException {
@@ -155,24 +155,24 @@ public class NoteConnection extends OsmConnection {
 	 * and this copy/paste business can go away.
 	 */
 	
-	protected NoteConnection(String serverUrl) {
+	protected NotesApi(String serverUrl) {
 		this.serverUrl = serverUrl;
 	}
 	
-    static public NoteConnection getNoteConnection(String serverUrl) {
-    	NoteConnection connection = instances.get(serverUrl);
-    	if (connection == null) {
-    		connection = new NoteConnection(serverUrl);
-    		instances.put(serverUrl, connection);
+    static public NotesApi getNotesApi(String serverUrl) {
+    	NotesApi api = instances.get(serverUrl);
+    	if (api == null) {
+    		api = new NotesApi(serverUrl);
+    		instances.put(serverUrl, api);
     	}
-    	return connection;
+    	return api;
     }
 	
-	public static NoteConnection getNoteConnection() {
+	public static NotesApi getNotesApi() {
 		String serverUrl = Main.pref.get("osm-server.url", OsmApi.DEFAULT_API_URL);
         if (serverUrl == null)
-            throw new IllegalStateException(tr("Preference ''{0}'' missing. Cannot initialize OsmApi.", "osm-server.url"));
-        return getNoteConnection(serverUrl);
+            throw new IllegalStateException(tr("Preference ''{0}'' missing. Cannot initialize NotesApi.", "osm-server.url"));
+        return getNotesApi(serverUrl);
 	}
 	
     private String sendRequest(String requestMethod, String urlSuffix,String requestBody, ProgressMonitor monitor, boolean doAuthenticate, boolean fastFail) throws OsmTransferException {

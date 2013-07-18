@@ -33,7 +33,7 @@ import java.io.IOException;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.api.util.NoteConnection;
+import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
 
 public class EditAction {
 
@@ -41,7 +41,7 @@ public class EditAction {
     	
     	Note newNote = null;
     	try {
-        	newNote = NoteConnection.getNoteConnection().AddCommentToNote(n, comment);
+        	newNote = NotesApi.getNotesApi().AddCommentToNote(n, comment);
         }
         catch(OsmTransferException e) {
         	e.printStackTrace();
