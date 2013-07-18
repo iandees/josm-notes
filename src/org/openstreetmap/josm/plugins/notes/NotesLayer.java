@@ -97,7 +97,7 @@ public class NotesLayer extends Layer implements MouseListener {
 
     @Override
     public String getToolTipText() {
-        return tr("Displays OpenStreetBugs issues");
+        return tr("Displays OpenStreetMap notes");
     }
 
     @Override
