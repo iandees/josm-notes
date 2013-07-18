@@ -98,7 +98,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     private boolean buttonLabels = Main.pref.getBoolean(ConfigKeys.NOTES_BUTTON_LABELS);
 
     public NotesDialog(final NotesPlugin plugin) {
-        super(tr("OpenStreetMap Notes"), "icon_error24",
+        super(tr("OpenStreetMap Notes"), "note_icon24.png",
                 tr("Opens the OpenStreetMap Notes window and activates the automatic download"), Shortcut.registerShortcut(
                         "view:osmnotes", tr("Toggle: {0}", tr("Open OpenStreetMap Notes")), KeyEvent.VK_B,
                         Shortcut.ALT_SHIFT), 150);

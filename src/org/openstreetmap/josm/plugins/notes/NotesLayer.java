@@ -193,7 +193,7 @@ public class NotesLayer extends Layer implements MouseListener {
 
     @Override
     public Icon getIcon() {
-        return NotesPlugin.loadIcon("icon_error16.png");
+        return NotesPlugin.loadIcon("open_note16.png");
     }
 
     private Note getNearestNode(Point p) {
