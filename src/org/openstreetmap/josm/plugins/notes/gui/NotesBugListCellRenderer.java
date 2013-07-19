@@ -69,10 +69,10 @@ public class NotesBugListCellRenderer implements ListCellRenderer<Note> {
         Icon icon = null;
         switch(note.getState()) {
             case closed:
-                icon = NotesPlugin.loadIcon("icon_valid16.png");
+                icon = NotesPlugin.loadIcon("closed_note16.png");
                 break;
             case open:
-                icon = NotesPlugin.loadIcon("icon_error16.png");
+                icon = NotesPlugin.loadIcon("open_note16.png");
                 break;
         }
         label.setIcon(icon);

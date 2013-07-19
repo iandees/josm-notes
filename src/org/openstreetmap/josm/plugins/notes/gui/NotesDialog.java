@@ -159,11 +159,11 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         closeIssue = new JButton(closeIssueAction);
         closeIssue.setEnabled(false);
         closeIssue.setToolTipText((String) closeIssue.getAction().getValue(Action.NAME));
-        closeIssue.setIcon(NotesPlugin.loadIcon("icon_valid22.png"));
+        closeIssue.setIcon(NotesPlugin.loadIcon("closed_note22.png"));
         PointToNewNoteAction nia = new PointToNewNoteAction(newIssue, notesPlugin);
         newIssue.setAction(nia);
         newIssue.setToolTipText((String) newIssue.getAction().getValue(Action.NAME));
-        newIssue.setIcon(NotesPlugin.loadIcon("icon_error_add22.png"));
+        newIssue.setIcon(NotesPlugin.loadIcon("new_note22.png"));
 
         buttonPanel.add(toggleConnectionMode);
         buttonPanel.add(refresh);

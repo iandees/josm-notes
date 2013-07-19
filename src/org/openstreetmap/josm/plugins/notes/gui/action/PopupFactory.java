@@ -61,7 +61,7 @@ public class PopupFactory {
             issuePopup.add(add);
             JMenuItem close = new JMenuItem();
             close.setAction(new CloseNoteAction(dialog));
-            close.setIcon(NotesPlugin.loadIcon("icon_valid16.png"));
+            close.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
             issuePopup.add(close);
             JMenuItem openInBrowser = new JMenuItem();
             openInBrowser.setAction(new OpenInBrowserAction(dialog));
@@ -84,7 +84,7 @@ public class PopupFactory {
             CloseNoteAction cia = new CloseNoteAction(dialog);
             cia.setEnabled(false);
             close.setAction(cia);
-            close.setIcon(NotesPlugin.loadIcon("icon_valid16.png"));
+            close.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
             fixedPopup.add(close);
             JMenuItem openInBrowser = new JMenuItem();
             openInBrowser.setAction(new OpenInBrowserAction(dialog));

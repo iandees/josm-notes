@@ -74,7 +74,7 @@ public class NewNoteAction extends NotesAction {
                 Main.map,
                 tr("Create note"),
                 tr("Describe the problem precisely"),
-                NotesPlugin.loadIcon("icon_error_add22.png"),
+                NotesPlugin.loadIcon("new_note22.png"),
                 history, l);
 
         if(result == null) {

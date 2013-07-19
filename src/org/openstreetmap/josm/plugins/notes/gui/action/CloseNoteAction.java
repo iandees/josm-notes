@@ -69,7 +69,7 @@ public class CloseNoteAction extends NotesAction {
         comment = TextInputDialog.showDialog(Main.map,
                 tr("Really close?"),
                 tr("<html>Really mark this note as ''done''?<br><br>You may add an optional comment:</html>"),
-                NotesPlugin.loadIcon("icon_valid22.png"),
+                NotesPlugin.loadIcon("closed_note22.png"),
                 history, l);
 
         if(comment == null) {

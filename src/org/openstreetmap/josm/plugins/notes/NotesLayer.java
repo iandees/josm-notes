@@ -62,8 +62,8 @@ public class NotesLayer extends Layer implements MouseListener {
 
     private JToolTip tooltip = new JToolTip();
 
-    private static ImageIcon iconError = NotesPlugin.loadIcon("icon_error16.png");
-    private static ImageIcon iconValid = NotesPlugin.loadIcon("icon_valid16.png");
+    private static ImageIcon iconError = NotesPlugin.loadIcon("open_note16.png");
+    private static ImageIcon iconValid = NotesPlugin.loadIcon("closed_note16.png");
 
     private NotesDialog dialog;
 
@@ -128,7 +128,7 @@ public class NotesLayer extends Layer implements MouseListener {
             int width = icon.getIconWidth();
             int height = icon.getIconHeight();
 
-            g.drawImage(icon.getImage(), p.x - (width / 2), p.y - (height / 2), new ImageObserver() {
+            g.drawImage(icon.getImage(), p.x - (width / 2), p.y - height, new ImageObserver() {
                 public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
                     return false;
                 }
@@ -157,7 +157,7 @@ public class NotesLayer extends Layer implements MouseListener {
             int height = icon.getIconHeight();
 
             g.setColor(ColorHelper.html2color(Main.pref.get("color.selected")));
-            g.drawRect(p.x-(width/2), p.y-(height/2), width-1, height-1);
+            g.drawRect(p.x-(width/2), p.y-height, width-1, height-1);
 
             // draw description
             StringBuilder sb = new StringBuilder("<html>");
