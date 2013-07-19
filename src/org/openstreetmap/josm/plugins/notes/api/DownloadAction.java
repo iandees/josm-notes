@@ -42,9 +42,12 @@ public class DownloadAction {
     public void execute(List<Note> dataset, Bounds bounds) throws IOException {
 
         int zoom = OsmUrlToBounds.getZoom(Main.map.mapView.getRealBounds());
-        // check zoom level
-        if(zoom > 15 || zoom < 9) {
-            return;
+        double requestArea = Main.map.mapView.getRealBounds().getArea();
+
+        //API limits requests to 25 square degrees.
+        //If zoomed in beyond 16 it is pointless to redownload such a small area.
+        if(requestArea > 25 || zoom > 15) {
+        	return;
         }
 
         try {
