@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 import javax.swing.AbstractListModel;
 
-public class ActionQueue extends AbstractListModel<NotesAction> {
+public class ActionQueue extends AbstractListModel {
 
 	private static final long serialVersionUID = 1L;
 	

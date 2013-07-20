@@ -43,13 +43,15 @@ import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.Note.Comment;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
-public class NotesBugListCellRenderer implements ListCellRenderer<Note> {
+public class NotesBugListCellRenderer implements ListCellRenderer {
 
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
 	
-    public Component getListCellRendererComponent(JList<? extends Note> list, Note note, int index, boolean isSelected,
+    public Component getListCellRendererComponent(JList list, Object n, int index, boolean isSelected,
             boolean cellHasFocus) {
+    	
+    	Note note = (Note)n;
 
         JLabel label = new JLabel();
         label.setOpaque(true);
