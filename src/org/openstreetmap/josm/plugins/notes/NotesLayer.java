@@ -52,6 +52,7 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.plugins.notes.Note.Comment;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.ColorHelper;
 
@@ -161,17 +162,35 @@ public class NotesLayer extends Layer implements MouseListener {
 
             // draw description
             StringBuilder sb = new StringBuilder("<html>");
-            sb.append(note.getFirstComment().getText());
+            //sb.append(note.getFirstComment().getText());
+            List<Comment> comments = note.getComments();
+            String sep = "";
+            for(Comment comment: comments) {
+            	String commentText = comment.getText();
+            	//closing a note creates an empty comment that we don't want to show
+            	if(commentText != null && commentText.trim().length() > 0) {
+	            	sb.append(sep);
+	            	String userName = comment.getUser().getName();
+	            	System.out.println("user name: >" + userName + "<");
+	            	if(userName == null || userName.trim().length() == 0) {
+	            		userName = "&lt;Anonymous&gt;";
+	            	}
+	            	sb.append(userName);
+	            	sb.append(":<br/>");
+	            	sb.append(comment.getText());
+            	}
+            	sep = "<hr/>";
+            }
             sb.append("</html>");
 
             // draw description as a tooltip
             tooltip.setTipText(sb.toString());
 
             int tx = p.x + (width / 2) + 5;
-            int ty = (p.y - height / 2) -1;
+            int ty = p.y - height -1;
             g.translate(tx, ty);
 
-            // This limits the width of the tooltip to 2/3 of the drawing
+            // This limits the width of the tooltip to 1/2 of the drawing
             // area, which makes longer tooltips actually readable (they
             // would disappear if scrolled too much to the right)
 
@@ -179,7 +198,7 @@ public class NotesLayer extends Layer implements MouseListener {
             // the reduced width into account
             for(int x = 0; x < 2; x++) {
                 Dimension d = tooltip.getUI().getPreferredSize(tooltip);
-                d.width = Math.min(d.width, (mv.getWidth()*2/3));
+                d.width = Math.min(d.width, (mv.getWidth()*1/2));
                 tooltip.setSize(d);
                 tooltip.paint(g);
             }
