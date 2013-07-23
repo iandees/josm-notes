@@ -29,9 +29,13 @@ package org.openstreetmap.josm.plugins.notes;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -44,6 +48,8 @@ import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
+import org.openstreetmap.josm.gui.NavigatableComponent;
+import org.openstreetmap.josm.gui.NavigatableComponent.ZoomChangeListener;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.Plugin;
@@ -57,7 +63,7 @@ import org.openstreetmap.josm.tools.ImageProvider;
  *
  * @author Henrik Niehaus (henrik dot niehaus at gmx dot de)
  */
-public class NotesPlugin extends Plugin implements LayerChangeListener {
+public class NotesPlugin extends Plugin implements LayerChangeListener, ZoomChangeListener {
 
     private List<Note> allNotes = new ArrayList<Note>();
     private List<Note> selectedNotes = new ArrayList<Note>(1);
@@ -69,6 +75,16 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
     private NotesLayer layer;
 
     private DownloadAction download = new DownloadAction();
+    private Bounds lastBbox;
+    private TimerTask task;
+    private Timer timer = new Timer();
+
+    private ComponentAdapter viewChangeAdapter = new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            grabNotes();
+        }
+    };
 
     public NotesPlugin(PluginInformation info) {
         super(info);
@@ -80,6 +96,9 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         if (newFrame != null) {
             dialog = new NotesDialog(this);
             newFrame.addToggleDialog(dialog);
+            if (newFrame.mapView != null) {
+                newFrame.mapView.addComponentListener(viewChangeAdapter);
+            }
 
             MapView.addLayerChangeListener(this);
 
@@ -88,6 +107,9 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
         } else {
             MapView.removeLayerChangeListener(this);
             UploadAction.unregisterUploadHook(uploadHook);
+            if (oldFrame.mapView != null) {
+                oldFrame.mapView.removeComponentListener(viewChangeAdapter);
+            }
             uploadHook = null;
             dialog = null;
         }
@@ -216,12 +238,13 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
     public void layerAdded(Layer newLayer) {
         if(newLayer instanceof OsmDataLayer) {
             // start the auto download loop
-            NotesDownloadLoop.getInstance().setPlugin(this);
+            NavigatableComponent.addZoomChangeListener(this);
         }
     }
 
     public void layerRemoved(Layer oldLayer) {
         if(oldLayer == layer) {
+            NavigatableComponent.removeZoomChangeListener(this);
             layer = null;
         }
     }
@@ -240,6 +263,51 @@ public class NotesPlugin extends Plugin implements LayerChangeListener {
 
     public NotesDialog getDialog() {
         return dialog;
+    }
+
+    @Override
+    public void zoomChanged() {
+        grabNotes();
+    }
+
+    private void grabNotes() {
+        if (Main.map == null)
+            return;
+        MapView mv = Main.map.mapView;
+        Bounds bbox = mv.getLatLonBounds(mv.getBounds());
+
+        // Have the user changed view since last time
+        boolean active = isActive();
+        if (active && (lastBbox == null || !lastBbox.equals(bbox))) {
+            if (task != null) {
+                task.cancel();
+            }
+
+            // wait 500ms before downloading in case the user is in the middle
+            // of a pan/zoom
+            task = new DownloadNotesTask();
+            timer.schedule(task, 500);
+            lastBbox = bbox;
+        }
+    }
+
+    private boolean isActive() {
+        return Main.pref.getBoolean(ConfigKeys.NOTES_AUTO_DOWNLOAD)
+                && !Main.pref.getBoolean(ConfigKeys.NOTES_API_OFFLINE)
+                && getDialog() != null
+                && getDialog().isDialogShowing();
+    }
+
+    private class DownloadNotesTask extends TimerTask {
+
+        @Override
+        public void run() {
+            if (!isActive())
+                return;
+
+            updateData();
+        }
+
     }
 
 }
