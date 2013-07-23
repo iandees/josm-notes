@@ -27,11 +27,8 @@
  */
 package org.openstreetmap.josm.plugins.notes.api;
 
-import java.awt.Point;
 import java.io.IOException;
 
-
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
@@ -40,10 +37,7 @@ import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
 public class NewAction {
 
 
-    public Note execute(Point p, String text) throws IOException {
-        // where has the issue been added
-        LatLon latlon = Main.map.mapView.getLatLon(p.x, p.y);
-        
+    public Note execute(LatLon latlon, String text) throws IOException {
         try {
         	return NotesApi.getNotesApi().createNote(latlon, text);
         }

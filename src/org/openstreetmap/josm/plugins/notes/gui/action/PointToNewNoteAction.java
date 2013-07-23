@@ -40,6 +40,8 @@ import javax.swing.JToggleButton;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
+import org.openstreetmap.josm.data.coor.LatLon;
+
 public class PointToNewNoteAction extends AbstractAction implements MouseListener {
 
     private static final long serialVersionUID = 1L;
@@ -75,9 +77,10 @@ public class PointToNewNoteAction extends AbstractAction implements MouseListene
     }
 
     private void addNewIssue(MouseEvent e) {
-        NewNoteAction nia = new NewNoteAction(plugin, e.getPoint());
-        nia.actionPerformed(new ActionEvent(this, 0, ""));
-        reset();
+    	LatLon latlon = Main.map.mapView.getLatLon(e.getPoint().x, e.getPoint().y);
+    	NewNoteAction nia = new NewNoteAction(plugin, latlon);
+    	nia.actionPerformed(new ActionEvent(this, 0, ""));
+    	reset();
     }
 
     public void mouseReleased(MouseEvent e) {}

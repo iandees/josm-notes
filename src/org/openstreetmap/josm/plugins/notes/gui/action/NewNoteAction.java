@@ -43,6 +43,8 @@ import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.NewAction;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;
 
+import org.openstreetmap.josm.data.coor.LatLon;
+
 public class NewNoteAction extends NotesAction {
 
     private static final long serialVersionUID = 1L;
@@ -50,15 +52,15 @@ public class NewNoteAction extends NotesAction {
     private NotesPlugin plugin;
 
     private String result;
-
-    private Point p;
+    
+    private LatLon latlon;
 
     private NewAction newAction = new NewAction();
 
-    public NewNoteAction(NotesPlugin plugin, Point p) {
+    public NewNoteAction(NotesPlugin plugin, LatLon latlon) {
         super(tr("New note"), plugin.getDialog());
         this.plugin = plugin;
-        this.p = p;
+        this.latlon = latlon;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class NewNoteAction extends NotesAction {
     @Override
     public void execute() throws IOException {
         if (result.length() > 0) {
-            Note n = newAction.execute(p, result);
+            Note n = newAction.execute(latlon, result);
             plugin.getDataSet().add(n);
             if (Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
                 plugin.updateGui();
@@ -102,10 +104,10 @@ public class NewNoteAction extends NotesAction {
 
     @Override
     public NotesAction clone() {
-        NewNoteAction action = new NewNoteAction(plugin, p);
+        NewNoteAction action = new NewNoteAction(plugin, latlon);
         action.canceled = canceled;
-        action.p = p;
         action.result = result;
+        action.latlon = latlon;
         return action;
     }
 }
