@@ -75,6 +75,10 @@ public class NotesXmlParser extends DefaultHandler {
         } else if ("comment".equals(qName)) {
             User commentUser = User.createOsmUser(commentUid, commentUsername);
             thisNote.addComment(thisNote.new Comment(commentCreateDate, commentUser, commentText));
+            commentUid = 0;
+            commentUsername = null;
+            commentCreateDate = null;
+            commentText = null;
         }
     }
 
