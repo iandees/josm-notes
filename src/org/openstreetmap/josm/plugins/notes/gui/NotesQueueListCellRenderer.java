@@ -65,11 +65,11 @@ public class NotesQueueListCellRenderer implements ListCellRenderer {
 
         Icon icon = null;
         if(action instanceof NewNoteAction) {
-            icon = NotesPlugin.loadIcon("icon_error_add16.png");
+            icon = NotesPlugin.loadIcon("new_note16.png");
         } else if(action instanceof AddCommentAction) {
             icon = NotesPlugin.loadIcon("add_comment16.png");
         } else if(action instanceof CloseNoteAction) {
-            icon = NotesPlugin.loadIcon("icon_valid16.png");
+            icon = NotesPlugin.loadIcon("closed_note16.png");
         }
         label.setIcon(icon);
         String text = action.toString();
