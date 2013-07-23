@@ -171,7 +171,6 @@ public class NotesLayer extends Layer implements MouseListener {
             	if(commentText != null && commentText.trim().length() > 0) {
 	            	sb.append(sep);
 	            	String userName = comment.getUser().getName();
-	            	System.out.println("user name: >" + userName + "<");
 	            	if(userName == null || userName.trim().length() == 0) {
 	            		userName = "&lt;Anonymous&gt;";
 	            	}
@@ -221,6 +220,8 @@ public class NotesLayer extends Layer implements MouseListener {
         Note minPrimitive = null;
         for (Note note : data) {
             Point sp = Main.map.mapView.getPoint(note.getLatLon());
+            //move the hotpoint location up to the center of the displayed icon where people are likely to click
+            sp.setLocation(sp.getX(), sp.getY() - iconError.getIconHeight()/2);
             double dist = p.distanceSq(sp);
             if (minDistanceSq > dist && p.distance(sp) < snapDistance) {
                 minDistanceSq = p.distanceSq(sp);
@@ -237,16 +238,14 @@ public class NotesLayer extends Layer implements MouseListener {
 
     public void mouseClicked(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1) {
-            if(Main.map.mapView.getActiveLayer() == this) {
-                Note n = getNearestNode(e.getPoint());
-                if(n != null && data.contains(n)) {
-                    selection.add(n);
-                } else {
-                    selection = new ArrayList<Note>();
-                }
-                dialog.setSelectedNote(n);
-                Main.map.mapView.repaint();
+            Note n = getNearestNode(e.getPoint());
+            if(n != null && data.contains(n)) {
+                selection.add(n);
+            } else {
+                selection = new ArrayList<Note>();
             }
+            dialog.setSelectedNote(n);
+            Main.map.mapView.repaint();
         }
     }
 
@@ -260,12 +259,10 @@ public class NotesLayer extends Layer implements MouseListener {
 
     private void mayTriggerPopup(MouseEvent e) {
         if(e.isPopupTrigger()) {
-            if(Main.map.mapView.getActiveLayer() == this) {
-                Note n = getNearestNode(e.getPoint());
-                if(n != null && data.contains(n)) {
-                    System.out.println("Popup goes here?");
-                    //PopupFactory.createPopup(n, dialog).show(e.getComponent(), e.getX(), e.getY());
-                }
+            Note n = getNearestNode(e.getPoint());
+            if(n != null && data.contains(n)) {
+                System.out.println("Popup goes here?");
+                //PopupFactory.createPopup(n, dialog).show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
