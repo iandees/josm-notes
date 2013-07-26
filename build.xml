@@ -17,7 +17,7 @@
 -->
 <project name="notes" default="dist" basedir=".">
     <property name="commit.message" value="Changed the constructor signature of the plugin main class"/>
-    <property name="plugin.main.version" value="6070"/>
+    <property name="plugin.main.version" value="6076"/>
     <property name="josm" location="../josm/dist/josm-custom.jar"/>
     <property name="plugin.dist.dir" value="../josm/dist"/>
     <property name="plugin.build.dir" value="build"/>
@@ -28,7 +28,7 @@
     </target>
     <target name="compile" depends="init">
         <echo message="creating ${plugin.jar}"/>
-        <javac srcdir="src" classpath="${josm}" debug="true" target="1.6" destdir="${plugin.build.dir}">
+        <javac srcdir="src" classpath="${josm}" debug="true" target="${ant.build.javac.target}" destdir="${plugin.build.dir}">
             <compilerarg value="-Xlint:deprecation"/>
             <compilerarg value="-Xlint:unchecked"/>
         </javac>

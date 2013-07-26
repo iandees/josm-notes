@@ -89,10 +89,11 @@ public class CloseNoteAction extends NotesAction {
         } catch (OsmApiException e) {
             String reason;
             if (e.getErrorHeader().contains("capability")) {
-                reason = tr("your version of JOSM does not support note creation. Please upgrade to at least JOSM version 6060.");
+                reason = tr("your version of JOSM does not support closing comments. Please upgrade to JOSM version 6076.");
             } else {
                 reason = e.getErrorHeader();
             }
+            e.printStackTrace();
             JOptionPane.showMessageDialog(
                     Main.parent,
                     tr("Could not create a new note because {0}", reason),
@@ -100,6 +101,7 @@ public class CloseNoteAction extends NotesAction {
                     JOptionPane.WARNING_MESSAGE
             );
         } catch (OsmTransferException e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(
                     Main.parent,
                     tr("Could not create a new note because {0}", e.getMessage()),
