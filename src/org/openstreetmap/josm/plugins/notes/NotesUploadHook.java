@@ -48,7 +48,7 @@ public class NotesUploadHook implements UploadHook {
         containsOsbData |= checkOpenStreetBugs(apiData.getPrimitivesToDelete());
         if(containsOsbData) {
             JOptionPane.showMessageDialog(Main.parent,
-                tr("<html>The selected data contains data from OpenStreetBugs.<br>" +
+                tr("<html>The selected data contains Notes.<br>" +
                 "You cannot upload this data. Maybe you have selected the wrong layer?"),
                 tr("Warning"), JOptionPane.WARNING_MESSAGE);
             return false;
