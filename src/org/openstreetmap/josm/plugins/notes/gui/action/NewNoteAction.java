@@ -29,21 +29,23 @@ package org.openstreetmap.josm.plugins.notes.gui.action;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
+import org.openstreetmap.josm.io.OsmApiException;
+import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.NewAction;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;
-
-import org.openstreetmap.josm.data.coor.LatLon;
 
 public class NewNoteAction extends NotesAction {
 
@@ -52,7 +54,7 @@ public class NewNoteAction extends NotesAction {
     private NotesPlugin plugin;
 
     private String result;
-    
+
     private LatLon latlon;
 
     private NewAction newAction = new NewAction();
@@ -87,8 +89,30 @@ public class NewNoteAction extends NotesAction {
     @Override
     public void execute() throws IOException {
         if (result.length() > 0) {
-            Note n = newAction.execute(latlon, result);
-            plugin.getDataSet().add(n);
+            try {
+                Note n = newAction.execute(latlon, result);
+                plugin.getDataSet().add(n);
+            } catch (OsmApiException e) {
+                String reason;
+                if (e.getErrorHeader().contains("capability")) {
+                    reason = tr("your version of JOSM does not support note creation. Please upgrade to at least JOSM version 6060.");
+                } else {
+                    reason = e.getErrorHeader();
+                }
+                JOptionPane.showMessageDialog(
+                        Main.parent,
+                        tr("Could not create a new note because {0}", reason),
+                        tr("Error create a new note"),
+                        JOptionPane.WARNING_MESSAGE
+                );
+            } catch (OsmTransferException e) {
+                JOptionPane.showMessageDialog(
+                        Main.parent,
+                        tr("Could not create a new note because {0}", e.getMessage()),
+                        tr("Error create a new note"),
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
             if (Main.pref.getBoolean(ConfigKeys.NOTES_API_DISABLED)) {
                 plugin.updateGui();
             } else {

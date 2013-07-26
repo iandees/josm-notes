@@ -34,8 +34,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
+import org.openstreetmap.josm.io.OsmApiException;
+import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
@@ -80,7 +84,29 @@ public class AddCommentAction extends NotesAction {
 
     @Override
     public void execute() throws IOException {
-        editAction.execute(note, comment);
+        try {
+            editAction.execute(note, comment);
+        } catch (OsmApiException e) {
+            String reason;
+            if (e.getErrorHeader().contains("capability")) {
+                reason = tr("your version of JOSM does not support note creation. Please upgrade to at least JOSM version 6060.");
+            } else {
+                reason = e.getErrorHeader();
+            }
+            JOptionPane.showMessageDialog(
+                    Main.parent,
+                    tr("Could not create a new note because {0}", reason),
+                    tr("Error create a new note"),
+                    JOptionPane.WARNING_MESSAGE
+            );
+        } catch (OsmTransferException e) {
+            JOptionPane.showMessageDialog(
+                    Main.parent,
+                    tr("Could not create a new note because {0}", e.getMessage()),
+                    tr("Error create a new note"),
+                    JOptionPane.WARNING_MESSAGE
+            );
+        }
     }
 
     @Override

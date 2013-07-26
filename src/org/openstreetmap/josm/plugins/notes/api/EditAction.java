@@ -27,9 +27,6 @@
  */
 package org.openstreetmap.josm.plugins.notes.api;
 
-import java.io.IOException;
-
-
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
@@ -37,16 +34,10 @@ import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
 
 public class EditAction {
 
-    public void execute(Note n, String comment) throws IOException {
-    	
-    	Note newNote = null;
-    	try {
-        	newNote = NotesApi.getNotesApi().AddCommentToNote(n, comment);
-        }
-        catch(OsmTransferException e) {
-        	e.printStackTrace();
-        }
-    	
+    public void execute(Note n, String comment) throws OsmTransferException {
+
+        Note newNote = NotesApi.getNotesApi().AddCommentToNote(n, comment);
+
     	if (newNote != null) {
     		n.updateWith(newNote);
             Main.map.mapView.repaint();

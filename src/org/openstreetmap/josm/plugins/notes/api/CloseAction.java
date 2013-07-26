@@ -27,12 +27,6 @@
  */
 package org.openstreetmap.josm.plugins.notes.api;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.io.IOException;
-
-import javax.swing.JOptionPane;
-
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
@@ -40,17 +34,9 @@ import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
 
 public class CloseAction {
 
-    public void execute(Note n, String closeMsg) throws IOException {
-    	try {
-    		NotesApi.getNotesApi().closeNote(n, closeMsg);
-    		n.setState(Note.State.closed);
-    		Main.map.mapView.repaint();
-    	}
-    	catch(OsmTransferException e) {
-    		JOptionPane.showMessageDialog(Main.parent, 
-    				tr("An error occurred: {0}", new Object[] {e.getMessage()}), 
-    				tr("Error"), 
-    				JOptionPane.ERROR_MESSAGE);
-    	}
+    public void execute(Note n, String closeMsg) throws OsmTransferException {
+		NotesApi.getNotesApi().closeNote(n, closeMsg);
+		n.setState(Note.State.closed);
+		Main.map.mapView.repaint();
     }
 }

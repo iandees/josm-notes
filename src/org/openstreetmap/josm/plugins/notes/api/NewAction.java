@@ -35,15 +35,7 @@ import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
 
 public class NewAction {
-
-
-    public Note execute(LatLon latlon, String text) throws IOException {
-        try {
-        	return NotesApi.getNotesApi().createNote(latlon, text);
-        }
-        catch(OsmTransferException e) {
-        	e.printStackTrace();
-        }
-        return null;
+    public Note execute(LatLon latlon, String text) throws IOException, OsmTransferException {
+        return NotesApi.getNotesApi().createNote(latlon, text);
     }
 }
