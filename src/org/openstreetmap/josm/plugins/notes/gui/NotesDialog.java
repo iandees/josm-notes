@@ -72,6 +72,7 @@ import org.openstreetmap.josm.plugins.notes.gui.action.NotesAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NotesActionObserver;
 import org.openstreetmap.josm.plugins.notes.gui.action.PointToNewNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.PopupFactory;
+import org.openstreetmap.josm.plugins.notes.gui.action.ReopenAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.ToggleConnectionModeAction;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
 import org.openstreetmap.josm.tools.Shortcut;
@@ -88,6 +89,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     private JButton refresh;
     private JButton addComment;
     private JButton closeIssue;
+    private JButton reopenNote;
     private JButton processQueue = new JButton(tr("Process queue"));
     private JToggleButton newIssue = new JToggleButton();
     private JToggleButton toggleConnectionMode;
@@ -117,7 +119,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         bugListPanel.add(new JScrollPane(bugList), BorderLayout.CENTER);
 
         // create dialog buttons
-        GridLayout layout = buttonLabels ? new GridLayout(3, 2) : new GridLayout(1, 5);
+        GridLayout layout = buttonLabels ? new GridLayout(3, 2) : new GridLayout(1, 6);
         JPanel buttonPanel = new JPanel(layout);
         refresh = new JButton(tr("Refresh"));
         refresh.setToolTipText(tr("Refresh"));
@@ -164,12 +166,16 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         newIssue.setAction(nia);
         newIssue.setToolTipText((String) newIssue.getAction().getValue(Action.NAME));
         newIssue.setIcon(NotesPlugin.loadIcon("new_note22.png"));
+        ReopenAction reopenAction = new ReopenAction(this);
+        reopenNote = new JButton(reopenAction);
+        reopenNote.setToolTipText(reopenNote.getAction().getValue(Action.NAME).toString());
 
         buttonPanel.add(toggleConnectionMode);
         buttonPanel.add(refresh);
         buttonPanel.add(newIssue);
         buttonPanel.add(addComment);
         buttonPanel.add(closeIssue);
+        buttonPanel.add(reopenNote);
 
         queuePanel = new JPanel(new BorderLayout());
         queuePanel.setName(tr("Queue"));

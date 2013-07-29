@@ -63,6 +63,11 @@ public class PopupFactory {
             close.setAction(new CloseNoteAction(dialog));
             close.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
             issuePopup.add(close);
+            JMenuItem reopen = new JMenuItem();
+            reopen.setAction(new ReopenAction(dialog));
+            reopen.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
+            reopen.setEnabled(false);
+            issuePopup.add(reopen);
             JMenuItem openInBrowser = new JMenuItem();
             openInBrowser.setAction(new OpenInBrowserAction(dialog));
             openInBrowser.setIcon(NotesPlugin.loadIcon("internet-web-browser.png"));
@@ -86,6 +91,10 @@ public class PopupFactory {
             close.setAction(cia);
             close.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
             fixedPopup.add(close);
+            JMenuItem reopen = new JMenuItem();
+            reopen.setAction(new ReopenAction(dialog));
+            reopen.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
+            fixedPopup.add(reopen);
             JMenuItem openInBrowser = new JMenuItem();
             openInBrowser.setAction(new OpenInBrowserAction(dialog));
             openInBrowser.setIcon(NotesPlugin.loadIcon("internet-web-browser.png"));
