@@ -82,6 +82,32 @@ public class NotesApi extends OsmConnection {
 		sendRequest("POST", urlBuilder.toString(), null, monitor, true, false);
 	}
 	
+	public Note reopenNote(Note note, String reactivateMessage) throws OsmTransferException {
+		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		String encodedMessage;
+		try {
+			encodedMessage = URLEncoder.encode(reactivateMessage, "UTF-8");
+		} catch(UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
+		StringBuilder urlBuilder = new StringBuilder()
+			.append("notes/")
+			.append(note.getId())
+			.append("/reopen");
+		if(encodedMessage != null && !encodedMessage.trim().isEmpty()) {
+			urlBuilder.append("?text=");
+			urlBuilder.append(encodedMessage);
+		}
+	
+		String response = sendRequest("POST", urlBuilder.toString(), null, monitor, true, false);
+		List<Note> newNote = parseNotes(response);
+		if(newNote.size() != 0) {
+			return newNote.get(0);
+		}
+		return null;
+	}
+	
 	public Note createNote(LatLon latlon, String text) throws OsmTransferException {
 		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
 		String encodedText;
