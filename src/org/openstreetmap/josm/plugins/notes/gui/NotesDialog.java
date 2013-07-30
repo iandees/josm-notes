@@ -209,6 +209,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
             addComment.setHorizontalAlignment(SwingConstants.LEFT);
             closeIssue.setHorizontalAlignment(SwingConstants.LEFT);
             newIssue.setHorizontalAlignment(SwingConstants.LEFT);
+            reopenNote.setHorizontalAlignment(SwingConstants.LEFT);
         } else {
             toggleConnectionMode.setText(null);
             refresh.setText(null);
