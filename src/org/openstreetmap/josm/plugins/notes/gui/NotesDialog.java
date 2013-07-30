@@ -247,6 +247,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         if (bugList.getSelectedValues().length == 0) {
             addComment.setEnabled(false);
             closeIssue.setEnabled(false);
+            reopenNote.setEnabled(false);
             return;
         }
 
@@ -259,9 +260,12 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
             case closed:
                 addComment.setEnabled(false);
                 closeIssue.setEnabled(false);
+                reopenNote.setEnabled(true);
+                break;
             case open:
                 addComment.setEnabled(true);
                 closeIssue.setEnabled(true);
+                reopenNote.setEnabled(false);
             }
 
             scrollToSelected(note);
