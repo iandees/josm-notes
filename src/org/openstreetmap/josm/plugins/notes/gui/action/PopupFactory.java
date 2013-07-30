@@ -65,7 +65,7 @@ public class PopupFactory {
             issuePopup.add(close);
             JMenuItem reopen = new JMenuItem();
             reopen.setAction(new ReopenAction(dialog));
-            reopen.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
+            reopen.setIcon(NotesPlugin.loadIcon("reopen_note16.png"));
             reopen.setEnabled(false);
             issuePopup.add(reopen);
             JMenuItem openInBrowser = new JMenuItem();
@@ -93,7 +93,7 @@ public class PopupFactory {
             fixedPopup.add(close);
             JMenuItem reopen = new JMenuItem();
             reopen.setAction(new ReopenAction(dialog));
-            reopen.setIcon(NotesPlugin.loadIcon("closed_note16.png"));
+            reopen.setIcon(NotesPlugin.loadIcon("reopen_note16.png"));
             fixedPopup.add(reopen);
             JMenuItem openInBrowser = new JMenuItem();
             openInBrowser.setAction(new OpenInBrowserAction(dialog));

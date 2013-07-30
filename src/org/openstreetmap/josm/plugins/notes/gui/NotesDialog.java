@@ -168,6 +168,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         newIssue.setIcon(NotesPlugin.loadIcon("new_note22.png"));
         ReopenAction reopenAction = new ReopenAction(this);
         reopenNote = new JButton(reopenAction);
+        reopenNote.setIcon(NotesPlugin.loadIcon("reopen_note22.png"));
         reopenNote.setToolTipText(reopenNote.getAction().getValue(Action.NAME).toString());
 
         buttonPanel.add(toggleConnectionMode);

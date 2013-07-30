@@ -49,6 +49,8 @@ public class ReopenAction extends NotesAction {
 	@Override
 	public void execute() throws Exception {
 		NotesApi.getNotesApi().reopenNote(note, comment);
+		note.setState(Note.State.open);
+		Main.map.mapView.repaint();
 	}
 
 	@Override
