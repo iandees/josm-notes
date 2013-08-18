@@ -38,9 +38,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JToggleButton;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.plugins.notes.NotesPlugin;
-
 import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
 public class PointToNewNoteAction extends AbstractAction implements MouseListener {
 

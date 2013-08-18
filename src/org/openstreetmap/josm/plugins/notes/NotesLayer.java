@@ -76,7 +76,7 @@ public class NotesLayer extends Layer implements MouseListener {
 
         // if the map layer has been closed, while we are requesting the osb db,
         // the mapframe is null, so we check that, before installing the mouse listener
-        if(Main.map != null && Main.map.mapView != null) {
+        if (Main.map != null && Main.map.mapView != null) {
             Main.map.mapView.addMouseListener(this);
         }
     }
@@ -137,7 +137,7 @@ public class NotesLayer extends Layer implements MouseListener {
             });
         }
 
-        if(selection == null)
+        if (selection == null)
             return;
 
         // This loop renders the selection border and tooltips so they get drawn
@@ -159,29 +159,29 @@ public class NotesLayer extends Layer implements MouseListener {
             int height = icon.getIconHeight();
 
             g.setColor(ColorHelper.html2color(Main.pref.get("color.selected")));
-            g.drawRect(p.x-(width/2), p.y-height, width-1, height-1);
+            g.drawRect(p.x - (width / 2), p.y - height, width - 1, height - 1);
 
             // draw description
             StringBuilder sb = new StringBuilder("<html>");
             //sb.append(note.getFirstComment().getText());
             List<Comment> comments = note.getComments();
             String sep = "";
-            for(Comment comment: comments) {
-            	String commentText = comment.getText();
-            	//closing a note creates an empty comment that we don't want to show
-            	if(commentText != null && commentText.trim().length() > 0) {
-	            	sb.append(sep);
-	            	String userName = comment.getUser().getName();
-	            	if(userName == null || userName.trim().length() == 0) {
-	            		userName = "&lt;Anonymous&gt;";
-	            	}
-	            	sb.append(userName);
-	            	sb.append(":<br/>");
-	            	String htmlText = StringEscapeUtils.escapeXml(comment.getText());
-	            	htmlText = htmlText.replace("\n", "<br/>");
-	            	sb.append(htmlText);
-            	}
-            	sep = "<hr/>";
+            for (Comment comment : comments) {
+                String commentText = comment.getText();
+                //closing a note creates an empty comment that we don't want to show
+                if (commentText != null && commentText.trim().length() > 0) {
+                    sb.append(sep);
+                    String userName = comment.getUser().getName();
+                    if (userName == null || userName.trim().length() == 0) {
+                        userName = "&lt;Anonymous&gt;";
+                    }
+                    sb.append(userName);
+                    sb.append(":<br/>");
+                    String htmlText = StringEscapeUtils.escapeXml(comment.getText());
+                    htmlText = htmlText.replace("\n", "<br/>");
+                    sb.append(htmlText);
+                }
+                sep = "<hr/>";
             }
             sb.append("</html>");
 
@@ -189,7 +189,7 @@ public class NotesLayer extends Layer implements MouseListener {
             tooltip.setTipText(sb.toString());
 
             int tx = p.x + (width / 2) + 5;
-            int ty = p.y - height -1;
+            int ty = p.y - height - 1;
             g.translate(tx, ty);
 
             // This limits the width of the tooltip to 1/2 of the drawing
@@ -198,9 +198,9 @@ public class NotesLayer extends Layer implements MouseListener {
 
             // Need to do this twice as otherwise getPreferredSize doesn't take
             // the reduced width into account
-            for(int x = 0; x < 2; x++) {
+            for (int x = 0; x < 2; x++) {
                 Dimension d = tooltip.getUI().getPreferredSize(tooltip);
-                d.width = Math.min(d.width, (mv.getWidth()*1/2));
+                d.width = Math.min(d.width, (mv.getWidth() * 1 / 2));
                 tooltip.setSize(d);
                 tooltip.paint(g);
             }
@@ -224,15 +224,14 @@ public class NotesLayer extends Layer implements MouseListener {
         for (Note note : data) {
             Point sp = Main.map.mapView.getPoint(note.getLatLon());
             //move the hotpoint location up to the center of the displayed icon where people are likely to click
-            sp.setLocation(sp.getX(), sp.getY() - iconError.getIconHeight()/2);
+            sp.setLocation(sp.getX(), sp.getY() - iconError.getIconHeight() / 2);
             double dist = p.distanceSq(sp);
             if (minDistanceSq > dist && p.distance(sp) < snapDistance) {
                 minDistanceSq = p.distanceSq(sp);
                 minPrimitive = note;
             }
             // prefer already selected node when multiple nodes on one point
-            else if(minDistanceSq == dist && selection.contains(note) && !selection.contains(minPrimitive))
-            {
+            else if (minDistanceSq == dist && selection.contains(note) && !selection.contains(minPrimitive)) {
                 minPrimitive = note;
             }
         }
@@ -240,9 +239,9 @@ public class NotesLayer extends Layer implements MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
             Note n = getNearestNode(e.getPoint());
-            if(n != null && data.contains(n)) {
+            if (n != null && data.contains(n)) {
                 selection.add(n);
             } else {
                 selection = new ArrayList<Note>();
@@ -261,9 +260,9 @@ public class NotesLayer extends Layer implements MouseListener {
     }
 
     private void mayTriggerPopup(MouseEvent e) {
-        if(e.isPopupTrigger()) {
+        if (e.isPopupTrigger()) {
             Note n = getNearestNode(e.getPoint());
-            if(n != null && data.contains(n)) {
+            if (n != null && data.contains(n)) {
                 System.out.println("Popup goes here?");
                 //PopupFactory.createPopup(n, dialog).show(e.getComponent(), e.getX(), e.getY());
             }
