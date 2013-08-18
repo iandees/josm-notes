@@ -28,9 +28,15 @@
     </target>
     <target name="compile" depends="init">
         <echo message="creating ${plugin.jar}"/>
-        <javac srcdir="src" classpath="${josm}" debug="true" target="${ant.build.javac.target}" destdir="${plugin.build.dir}">
+        <javac srcdir="src" debug="true" target="${ant.build.javac.target}" destdir="${plugin.build.dir}">
             <compilerarg value="-Xlint:deprecation"/>
             <compilerarg value="-Xlint:unchecked"/>
+            <classpath>
+                <pathelement location="${josm}"/>
+                <fileset dir="lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
         </javac>
     </target>
     <target name="dist" depends="compile,revision">
@@ -41,6 +47,7 @@
             <fileset dir="data"/>
         </copy>
         <jar destfile="${plugin.jar}" basedir="${plugin.build.dir}">
+            <zipfileset src="lib/commons-lang3-3.1.jar" includes="**/*"/>
             <manifest>
                 <attribute name="Author" value="Ian Dees and Toby Murray"/>
                 <attribute name="Plugin-Class" value="org.openstreetmap.josm.plugins.notes.NotesPlugin"/>
