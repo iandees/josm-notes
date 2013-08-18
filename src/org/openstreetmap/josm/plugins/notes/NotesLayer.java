@@ -182,7 +182,7 @@ public class NotesLayer extends Layer implements MouseListener {
 	            	htmlText = htmlText.replaceAll("\n", "<br/>");
 	            	sb.append(htmlText);
             	}
-            	sep = "<hr>";
+            	sep = "<hr/>";
             }
             sb.append("</html>");
 
