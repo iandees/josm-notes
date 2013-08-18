@@ -179,7 +179,7 @@ public class NotesLayer extends Layer implements MouseListener {
 	            	sb.append(userName);
 	            	sb.append(":<br/>");
 	            	String htmlText = StringEscapeUtils.escapeHtml(comment.getText());
-	            	htmlText = htmlText.replaceAll("\n", "<br/>");
+	            	htmlText = htmlText.replace("\n", "<br/>");
 	            	sb.append(htmlText);
             	}
             	sep = "<hr/>";
