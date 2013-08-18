@@ -23,7 +23,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class NotesXmlParser extends DefaultHandler {
-    private String chars;
+    private StringBuffer buffer = new StringBuffer();
 
     private final static SimpleDateFormat NOTE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.ENGLISH);
 
@@ -37,23 +37,23 @@ public class NotesXmlParser extends DefaultHandler {
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        chars = new String(ch, start, length);
+        buffer.append(ch, start, length);
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if ("id".equals(qName)) {
-            thisNote.setId(Long.parseLong(chars));
+            thisNote.setId(Long.parseLong(buffer.toString()));
         } else if ("status".equals(qName)) {
-            thisNote.setState(Note.State.valueOf(chars));
+            thisNote.setState(Note.State.valueOf(buffer.toString()));
         } else if ("url".equals(qName)) {
-        	thisNote.setNoteUrl(chars);
+        	thisNote.setNoteUrl(buffer.toString());
         } else if ("date_created".equals(qName)) {
             // Note create date
             try {
-                thisNote.setCreatedAt(NOTE_DATE_FORMAT.parse(chars));
+                thisNote.setCreatedAt(NOTE_DATE_FORMAT.parse(buffer.toString()));
             } catch (ParseException e) {
-                System.err.println("Could not parse note date from API: \"" + chars + "\":");
+                System.err.println("Could not parse note date from API: \"" + buffer.toString() + "\":");
                 e.printStackTrace();
             }
         } else if ("note".equals(qName)) {
@@ -61,17 +61,17 @@ public class NotesXmlParser extends DefaultHandler {
         } else if ("date".equals(qName)) {
             // Comment create date
             try {
-                commentCreateDate = NOTE_DATE_FORMAT.parse(chars);
+                commentCreateDate = NOTE_DATE_FORMAT.parse(buffer.toString());
             } catch (ParseException e) {
-                System.err.println("Could not parse comment date from API: \"" + chars + "\":");
+                System.err.println("Could not parse comment date from API: \"" + buffer.toString() + "\":");
                 e.printStackTrace();
             }
         } else if ("user".equals(qName)) {
-            commentUsername = chars;
+            commentUsername = buffer.toString();
         } else if ("uid".equals(qName)) {
-            commentUid = Long.parseLong(chars);
+            commentUid = Long.parseLong(buffer.toString());
         } else if ("text".equals(qName)) {
-            commentText = chars;
+            commentText = buffer.toString();
         } else if ("comment".equals(qName)) {
             User commentUser = User.createOsmUser(commentUid, commentUsername);
             thisNote.addComment(thisNote.new Comment(commentCreateDate, commentUser, commentText));
@@ -84,6 +84,7 @@ public class NotesXmlParser extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
+        buffer.setLength(0);
         if ("note".equals(qName)) {
             double lat = Double.parseDouble(attrs.getValue("lat"));
             double lon = Double.parseDouble(attrs.getValue("lon"));
