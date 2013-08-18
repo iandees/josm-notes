@@ -81,7 +81,9 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
 
         StringBuilder sb = new StringBuilder();
         Comment firstComment = note.getFirstComment();
-        sb.append(firstComment.getText());
+        String text = firstComment.getText();
+        text = text.replace("\n", " ");
+        sb.append(text);
         sb.append(" (");
         sb.append(firstComment.getUser().getName());
         sb.append(tr(" at"));
