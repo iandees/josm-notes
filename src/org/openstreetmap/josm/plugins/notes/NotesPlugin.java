@@ -31,11 +31,11 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -65,8 +65,7 @@ import org.openstreetmap.josm.tools.ImageProvider;
  */
 public class NotesPlugin extends Plugin implements LayerChangeListener, ZoomChangeListener {
 
-    private List<Note> allNotes = new ArrayList<Note>();
-    private List<Note> selectedNotes = new ArrayList<Note>(1);
+    private List<Note> allNotes = new CopyOnWriteArrayList<Note>();
 
     private UploadHook uploadHook;
 
@@ -255,10 +254,6 @@ public class NotesPlugin extends Plugin implements LayerChangeListener, ZoomChan
 
     public Collection<Note> getDataSet() {
         return allNotes;
-    }
-
-    public Collection<Note> getSelection() {
-        return selectedNotes;
     }
 
     public NotesDialog getDialog() {
