@@ -179,7 +179,12 @@ public class NotesPlugin extends Plugin implements LayerChangeListener, ZoomChan
                     // we don't have to update the gui, because the user is not interested
                     // in this area anymore
                     if(Main.map != null && Main.map.mapView != null) {
-                        updateGui();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateGui();
+                            }
+                        });
                     }
                 }
             } catch (Exception e) {
