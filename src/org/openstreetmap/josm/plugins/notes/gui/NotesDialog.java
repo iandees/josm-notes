@@ -34,8 +34,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,7 +77,7 @@ import org.openstreetmap.josm.plugins.notes.gui.action.ToggleConnectionModeActio
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
 import org.openstreetmap.josm.tools.Shortcut;
 
-public class NotesDialog extends ToggleDialog implements NotesObserver, ListSelectionListener, LayerChangeListener, MouseListener, NotesActionObserver {
+public class NotesDialog extends ToggleDialog implements NotesObserver, LayerChangeListener, NotesActionObserver {
 
     private static final long serialVersionUID = 1L;
     private JPanel bugListPanel, queuePanel;
@@ -99,11 +99,73 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
     private boolean buttonLabels = Main.pref.getBoolean(ConfigKeys.NOTES_BUTTON_LABELS);
 
+    private class BugListMouseAdapter extends MouseAdapter {
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                Note selectedNote = getSelectedNote();
+                if(selectedNote != null) {
+                    notesPlugin.getLayer().replaceSelection(selectedNote);
+                    if (e.getClickCount() == 2) {
+                        zoomToNote(selectedNote);
+                    }
+                }
+            }
+        }
+
+        public void mousePressed(MouseEvent e) {
+            mayTriggerPopup(e);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            mayTriggerPopup(e);
+        }
+    }
+
+    private class BugListSelectionListener implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent e) {
+            if (bugList.getSelectedValues().length == 0) {
+                addComment.setEnabled(false);
+                closeIssue.setEnabled(false);
+                reopenNote.setEnabled(false);
+                return;
+            }
+
+            List<Note> selected = new ArrayList<Note>();
+            for (Object n : bugList.getSelectedValues()) {
+                Note note = (Note)n;
+                selected.add(note);
+
+                switch(note.getState()) {
+                case closed:
+                    addComment.setEnabled(false);
+                    closeIssue.setEnabled(false);
+                    reopenNote.setEnabled(true);
+                    break;
+                case open:
+                    addComment.setEnabled(true);
+                    closeIssue.setEnabled(true);
+                    reopenNote.setEnabled(false);
+                }
+
+                scrollToSelected(note);
+            }
+
+            // CurrentDataSet may be null if there is no normal, edible map
+            // If so, a temporary DataSet is created because it's the simplest way
+            // to fire all necessary events so OSB updates its popups.
+            List<Note> ds = notesPlugin.getLayer().getDataSet();
+            if (fireSelectionChanged) {
+                if(ds == null)
+                    ds = new ArrayList<Note>();
+            }
+        }
+    }
+
     public NotesDialog(final NotesPlugin plugin) {
         super(tr("OpenStreetMap Notes"), "note_icon24.png",
                 tr("Opens the OpenStreetMap Notes window and activates the automatic download"), Shortcut.registerShortcut(
                         "view:osmnotes", tr("Toggle: {0}", tr("Open OpenStreetMap Notes")), KeyEvent.VK_B,
-                        Shortcut.ALT_SHIFT), 150);
+                        Shortcut.ALT_SHIFT), 150, true);
 
         notesPlugin = plugin;
         bugListPanel = new JPanel(new BorderLayout());
@@ -113,8 +175,8 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         bugListModel = new DefaultListModel();
         bugList = new JList(bugListModel);
         bugList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        bugList.addListSelectionListener(this);
-        bugList.addMouseListener(this);
+        bugList.addListSelectionListener(new BugListSelectionListener());
+        bugList.addMouseListener(new BugListMouseAdapter());
         bugList.setCellRenderer(new NotesBugListCellRenderer());
         bugListPanel.add(new JScrollPane(bugList), BorderLayout.CENTER);
 
@@ -218,6 +280,8 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
             newIssue.setText(null);
         }
 
+        titleBar.registerMouseListener();
+
         addCommentAction.addActionObserver(this);
         closeIssueAction.addActionObserver(this);
         setConnectionMode(offline);
@@ -229,7 +293,6 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
     public void destroy() {
         super.destroy();
         MapView.removeLayerChangeListener(this);
-
     }
 
     public synchronized void update(final Collection<Note> dataset) {
@@ -241,44 +304,6 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
             bugListModel.addElement(note);
         }
         bugList.setModel(bugListModel);
-    }
-
-    public void valueChanged(ListSelectionEvent e) {
-        if (bugList.getSelectedValues().length == 0) {
-            addComment.setEnabled(false);
-            closeIssue.setEnabled(false);
-            reopenNote.setEnabled(false);
-            return;
-        }
-
-        List<Note> selected = new ArrayList<Note>();
-        for (Object n : bugList.getSelectedValues()) {
-        	Note note = (Note)n;
-            selected.add(note);
-
-            switch(note.getState()) {
-            case closed:
-                addComment.setEnabled(false);
-                closeIssue.setEnabled(false);
-                reopenNote.setEnabled(true);
-                break;
-            case open:
-                addComment.setEnabled(true);
-                closeIssue.setEnabled(true);
-                reopenNote.setEnabled(false);
-            }
-
-            scrollToSelected(note);
-        }
-
-        // CurrentDataSet may be null if there is no normal, edible map
-        // If so, a temporary DataSet is created because it's the simplest way
-        // to fire all necessary events so OSB updates its popups.
-        List<Note> ds = notesPlugin.getLayer().getDataSet();
-        if (fireSelectionChanged) {
-            if(ds == null)
-                ds = new ArrayList<Note>();
-        }
     }
 
     private void scrollToSelected(Note node) {
@@ -312,26 +337,6 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
         Main.map.mapView.zoomTo(node.getLatLon());
     }
 
-    public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            Note selectedNote = getSelectedNote();
-            if(selectedNote != null) {
-                notesPlugin.getLayer().replaceSelection(selectedNote);
-                if (e.getClickCount() == 2) {
-                    zoomToNote(selectedNote);
-                }
-            }
-        }
-    }
-
-    public void mousePressed(MouseEvent e) {
-        mayTriggerPopup(e);
-    }
-
-    public void mouseReleased(MouseEvent e) {
-        mayTriggerPopup(e);
-    }
-
     private void mayTriggerPopup(MouseEvent e) {
         if (e.isPopupTrigger()) {
             int selectedRow = bugList.locationToIndex(e.getPoint());
@@ -341,12 +346,6 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
                 PopupFactory.createPopup(selectedNote, this).show(e.getComponent(), e.getX(), e.getY());
             }
         }
-    }
-
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    public void mouseExited(MouseEvent e) {
     }
 
     public void actionPerformed(NotesAction action) {
@@ -431,15 +430,5 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, ListSele
 
     public ActionQueue getActionQueue() {
         return actionQueue;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-
-        bugList.setEnabled(enabled);
-        queueList.setEnabled(enabled);
-        addComment.setEnabled(enabled);
-        closeIssue.setEnabled(enabled);
     }
 }
