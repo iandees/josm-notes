@@ -89,7 +89,7 @@ public class AddCommentAction extends NotesAction {
         } catch (OsmApiException e) {
             String reason;
             if (e.getErrorHeader().contains("capability")) {
-                reason = tr("your version of JOSM does not support commenting on notes. Please upgrade to JOSM version 6076.");
+                reason = tr("your JOSM OAuth key does not support modifying notes. Reauthenticate with OAuth, restart JOSM, and try again.");
             } else {
                 reason = e.getErrorHeader();
             }
