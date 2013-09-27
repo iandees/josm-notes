@@ -41,6 +41,7 @@ import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.gui.action.AddCommentAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.CloseNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NewNoteAction;
+import org.openstreetmap.josm.plugins.notes.gui.action.ReopenAction;
 
 public class NotesQueueListCellRenderer implements ListCellRenderer {
 
@@ -70,6 +71,8 @@ public class NotesQueueListCellRenderer implements ListCellRenderer {
             icon = NotesPlugin.loadIcon("add_comment16.png");
         } else if(action instanceof CloseNoteAction) {
             icon = NotesPlugin.loadIcon("closed_note16.png");
+        } else if(action instanceof ReopenAction) {
+        	icon = NotesPlugin.loadIcon("reopen_note16.png");
         }
         label.setIcon(icon);
         String text = action.toString();

@@ -58,6 +58,11 @@ public class ReopenAction extends NotesAction {
 		note.setState(Note.State.open);
 		Main.map.mapView.repaint();
 	}
+	
+	@Override
+	public String toString() {
+		return tr("Reopen: Note " + note.getId() + " - Comment: " + comment);
+	}
 
 	@Override
 	public NotesAction clone() {
