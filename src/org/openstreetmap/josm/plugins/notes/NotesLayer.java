@@ -44,7 +44,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.RenameLayerAction;
 import org.openstreetmap.josm.data.Bounds;
@@ -53,6 +52,7 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.io.XmlWriter;
 import org.openstreetmap.josm.plugins.notes.Note.Comment;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.ColorHelper;
@@ -177,7 +177,7 @@ public class NotesLayer extends Layer implements MouseListener {
                     }
                     sb.append(userName);
                     sb.append(":<br/>");
-                    String htmlText = StringEscapeUtils.escapeXml(comment.getText());
+                    String htmlText = XmlWriter.encode(comment.getText(), true);
                     htmlText = htmlText.replace("\n", "<br/>");
                     sb.append(htmlText);
                 }
