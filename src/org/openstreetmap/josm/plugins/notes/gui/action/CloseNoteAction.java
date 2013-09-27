@@ -78,7 +78,10 @@ public class CloseNoteAction extends NotesAction {
 
         if(comment == null) {
             canceled = true;
+            return;
         }
+        note.setState(Note.State.closed);
+        dialog.refreshNoteStatus();
 
     }
 

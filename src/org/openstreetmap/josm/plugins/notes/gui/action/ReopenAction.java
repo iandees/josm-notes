@@ -43,7 +43,10 @@ public class ReopenAction extends NotesAction {
         
         if(comment == null) {
             canceled = true;
+            return;
         }
+        note.setState(Note.State.open);
+        dialog.refreshNoteStatus();
 	}
 
 	@Override

@@ -305,6 +305,10 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
         }
         bugList.setModel(bugListModel);
     }
+    
+    public void refreshNoteStatus() {
+    	update(notesPlugin.getDataSet());
+    }
 
     private void scrollToSelected(Note node) {
         for (int i = 0; i < bugListModel.getSize(); i++) {
