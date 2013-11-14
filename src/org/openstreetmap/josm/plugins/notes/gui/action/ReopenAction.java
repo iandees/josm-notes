@@ -36,9 +36,9 @@ public class ReopenAction extends NotesAction {
         };
 		note = dialog.getSelectedNote();
         comment = TextInputDialog.showDialog(Main.map,
-                tr("Really close?"),
+                tr("Really reopen?"),
                 tr("<html>Really reopen this note?<br><br>You may add an optional comment:</html>"),
-                NotesPlugin.loadIcon("closed_note22.png"),
+                NotesPlugin.loadIcon("reopen_note22.png"),
                 history, l);
         
         if(comment == null) {
