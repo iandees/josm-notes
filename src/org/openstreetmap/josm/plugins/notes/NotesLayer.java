@@ -36,6 +36,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.ImageObserver;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +64,8 @@ public class NotesLayer extends Layer implements MouseListener {
     private List<Note> selection = new ArrayList<Note>(1);
 
     private JToolTip tooltip = new JToolTip();
+
+    private SimpleDateFormat dayFormat = new SimpleDateFormat("MMM d, yyyy");
 
     private static ImageIcon iconError = NotesPlugin.loadIcon("open_note16.png");
     private static ImageIcon iconValid = NotesPlugin.loadIcon("closed_note16.png");
@@ -176,6 +179,8 @@ public class NotesLayer extends Layer implements MouseListener {
                         userName = "&lt;Anonymous&gt;";
                     }
                     sb.append(userName);
+                    sb.append(" on ");
+                    sb.append(dayFormat.format(comment.getCreatedAt()));
                     sb.append(":<br/>");
                     String htmlText = XmlWriter.encode(comment.getText(), true);
                     htmlText = htmlText.replace("\n", "<br/>");
