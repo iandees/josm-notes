@@ -32,6 +32,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.text.SimpleDateFormat;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -47,6 +48,8 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
 
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
+
+    private SimpleDateFormat dayFormat = new SimpleDateFormat("MMM d, yyyy");
 	
     public Component getListCellRendererComponent(JList list, Object n, int index, boolean isSelected,
             boolean cellHasFocus) {
@@ -85,10 +88,14 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
         text = text.replace("\n", " ");
         sb.append(text);
         sb.append(" (");
-        sb.append(firstComment.getUser().getName());
-        sb.append(tr(" at"));
+        String userName = firstComment.getUser().getName();
+        if(userName == null || userName.trim().length() == 0) {
+        	userName = "<Anonymous>";
+        }
+        sb.append(userName);
+        sb.append(tr(" on"));
         sb.append(" ");
-        sb.append(firstComment.getCreatedAt());
+        sb.append(dayFormat.format(firstComment.getCreatedAt()));
         sb.append(")");
         label.setText(sb.toString());
 
