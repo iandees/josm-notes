@@ -183,7 +183,7 @@ public class NotesLayer extends Layer implements MouseListener {
                     sb.append(dayFormat.format(comment.getCreatedAt()));
                     sb.append(":<br/>");
                     String htmlText = XmlWriter.encode(comment.getText(), true);
-                    htmlText = htmlText.replace("\n", "<br/>");
+                    htmlText = htmlText.replace("&#xA;", "<br/>"); //encode method leaves us with entity instead of \n
                     sb.append(htmlText);
                 }
                 sep = "<hr/>";
