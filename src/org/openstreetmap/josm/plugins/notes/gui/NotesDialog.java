@@ -278,6 +278,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
             addComment.setText(null);
             closeIssue.setText(null);
             newIssue.setText(null);
+            reopenNote.setText(null);
         }
 
         titleBar.registerMouseListener();
