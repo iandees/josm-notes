@@ -34,4 +34,5 @@ public class ConfigKeys {
     public static final String NOTES_COMMENT_HISTORY = "notes.comment.history";
     public static final String NOTES_NEW_HISTORY = "notes.new.history";
     public static final String NOTES_API_OFFLINE = "notes.api.offline";
+    public static final String NOTES_SEARCH_HISTORY = "notes.search.history";
 }

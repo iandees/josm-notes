@@ -160,6 +160,17 @@ public class NotesApi extends OsmConnection {
         return note;
 	}
 	
+	public List<Note> searchNotes(String searchTerm) throws OsmTransferException {
+		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+		
+		String url = new StringBuilder()
+			.append("notes/search?q=")
+			.append(searchTerm)
+            .toString();
+		String response = sendRequest("GET", url, null, monitor, false, true);
+		return parseNotes(response);
+	}
+	
 	private List<Note> parseNotes(String notesXml) {
 		try {
             return NotesXmlParser.parseNotes(notesXml);
