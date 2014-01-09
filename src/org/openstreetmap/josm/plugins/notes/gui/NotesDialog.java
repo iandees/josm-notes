@@ -203,6 +203,11 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
             }
         });
         bugListPanel.add(buttonPanel, BorderLayout.SOUTH);
+        //search button must be initialized before doClick is called below
+        SearchAction searchAction = new SearchAction(this, notesPlugin);
+        searchNotes = new JButton(searchAction);
+        searchNotes.setIcon(NotesPlugin.loadIcon("find_notes.png"));
+        
         Action toggleConnectionModeAction = new ToggleConnectionModeAction(this, notesPlugin);
         toggleConnectionMode = new JToggleButton(toggleConnectionModeAction);
         toggleConnectionMode.setToolTipText(ToggleConnectionModeAction.MSG_OFFLINE);
@@ -234,8 +239,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
         reopenNote = new JButton(reopenAction);
         reopenNote.setIcon(NotesPlugin.loadIcon("reopen_note22.png"));
         reopenNote.setToolTipText(reopenNote.getAction().getValue(Action.NAME).toString());
-        SearchAction searchAction = new SearchAction(this, notesPlugin);
-        searchNotes = new JButton(searchAction);
+        searchNotes.setToolTipText("Search for notes");
 
         buttonPanel.add(toggleConnectionMode);
         buttonPanel.add(refresh);
@@ -420,6 +424,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
 
     public void setConnectionMode(boolean offline) {
         refresh.setEnabled(!offline);
+        searchNotes.setEnabled(!offline);
         setTitle(tr("OpenStreetMap Notes ({0})", (offline ? tr("offline") : tr("online"))));
         toggleConnectionMode.setSelected(offline);
     }
