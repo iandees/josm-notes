@@ -162,10 +162,16 @@ public class NotesApi extends OsmConnection {
 	
 	public List<Note> searchNotes(String searchTerm) throws OsmTransferException {
 		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
-		
+		String searchTermEncoded = "";
+		try {
+			searchTermEncoded = URLEncoder.encode(searchTerm, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return new ArrayList<Note>();
+		}
 		String url = new StringBuilder()
 			.append("notes/search?q=")
-			.append(searchTerm)
+			.append(searchTermEncoded)
             .toString();
 		String response = sendRequest("GET", url, null, monitor, false, true);
 		return parseNotes(response);
