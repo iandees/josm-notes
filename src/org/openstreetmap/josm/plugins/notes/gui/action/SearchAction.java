@@ -58,7 +58,7 @@ public class SearchAction extends NotesAction {
 
 	@Override
 	public void execute() throws Exception {
-		List<Note> searchResults = NotesApi.getNotesApi().searchNotes(searchTerm);
+		List<Note> searchResults = NotesApi.getNotesApi().searchNotes(searchTerm, 1000, 0);
 		System.out.println("search results: " + searchResults.size());
         plugin.getDataSet().clear();
         plugin.getDataSet().addAll(searchResults);

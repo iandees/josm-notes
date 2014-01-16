@@ -56,7 +56,7 @@ public class NotesApi extends OsmConnection {
             .append(",").append(bounds.getMax().lon())
             .append(",").append(bounds.getMax().lat())
             .toString();
-		String response = sendRequest("GET", url, null, monitor, false, true);
+		String response = sendRequest("GET", url, null, monitor, false, false);
 		return parseNotes(response);
 	}
 	
@@ -159,23 +159,52 @@ public class NotesApi extends OsmConnection {
 		}
         return note;
 	}
-	
-	public List<Note> searchNotes(String searchTerm) throws OsmTransferException {
-		ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
-		String searchTermEncoded = "";
-		try {
-			searchTermEncoded = URLEncoder.encode(searchTerm, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return new ArrayList<Note>();
-		}
-		String url = new StringBuilder()
-			.append("notes/search?q=")
-			.append(searchTermEncoded)
-            .toString();
-		String response = sendRequest("GET", url, null, monitor, false, true);
-		return parseNotes(response);
-	}
+
+    /**
+     * Sends a request to the note search API which searches notes and comments
+     * for a specified string.
+     * @param searchTerm The string to search for
+     * @param bugLimit   How many bugs to limit the search to.
+     *                    Must be between 1 and 9999
+     * 					  If not specified (null) the API defaults to 100
+     * @param closedDays In addition to open notes, also find notes that have been
+     *                    closed in the last "x" days.
+     *                    0 means only open notes
+     *                    -1 means all notes
+     *                    If not specified (null) the API defaults to 7
+     * @return List of notes matching the search criteria or empty list if no matches are found
+     * @throws OsmTransferException
+     */
+    public List<Note> searchNotes(String searchTerm, Integer bugLimit, Integer closedDays) throws OsmTransferException {
+        if(bugLimit != null && (bugLimit < 1 || bugLimit > 9999)) {
+            throw new IllegalArgumentException("Bug limit must be between 1 and 9999");
+        }
+        if(closedDays != null && closedDays < -1) {
+            throw new IllegalArgumentException("Closed date must be -1 or greater");
+        }
+        ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+        String searchTermEncoded = "";
+        try {
+            searchTermEncoded = URLEncoder.encode(searchTerm, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new ArrayList<Note>();
+        }
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("notes/search?q=");
+        urlBuilder.append(searchTermEncoded);
+        if(bugLimit != null) {
+            urlBuilder.append("&limit=");
+            urlBuilder.append(bugLimit);
+        }
+        if(closedDays != null) {
+            urlBuilder.append("&closed=");
+            urlBuilder.append(closedDays);
+        }
+        String url = urlBuilder.toString();
+        String response = sendRequest("GET", url, null, monitor, false, false);
+        return parseNotes(response);
+    }
 	
 	private List<Note> parseNotes(String notesXml) {
 		try {
