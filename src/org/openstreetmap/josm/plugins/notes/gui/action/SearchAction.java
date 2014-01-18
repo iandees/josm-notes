@@ -62,8 +62,7 @@ public class SearchAction extends NotesAction {
         System.out.println("search results: " + searchResults.size());
         plugin.getDataSet().clear();
         plugin.getDataSet().addAll(searchResults);
-        Main.map.mapView.repaint();
-        dialog.refreshNoteStatus();
+        plugin.updateGui();
         dialog.setConnectionMode(true);
         dialog.showQueuePanel();
         Main.pref.put(ConfigKeys.NOTES_API_OFFLINE, true);
