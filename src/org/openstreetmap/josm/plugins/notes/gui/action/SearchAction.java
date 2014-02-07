@@ -58,7 +58,25 @@ public class SearchAction extends NotesAction {
 
     @Override
     public void execute() throws Exception {
-        List<Note> searchResults = NotesApi.getNotesApi().searchNotes(searchTerm, 1000, 0);
+        int noteLimit = Main.pref.getInteger(ConfigKeys.NOTES_SEARCH_LIMIT, 1000);
+        int daysClosed = Main.pref.getInteger(ConfigKeys.NOTES_SEARCH_DAYS_CLOSED, 0);
+        //make sure values are within API limits
+        if(noteLimit < 1) {
+        	System.out.println("Note download too low. Setting to 1");
+        	noteLimit = 1;
+        	Main.pref.putInteger(ConfigKeys.NOTES_SEARCH_LIMIT, noteLimit);
+        }
+        if(noteLimit > NotesApi.NOTE_DOWNLOAD_LIMIT) {
+        	System.out.println("Note download limit too high. Setting to API limit");
+        	noteLimit = NotesApi.NOTE_DOWNLOAD_LIMIT;
+        	Main.pref.putInteger(ConfigKeys.NOTES_SEARCH_LIMIT, noteLimit);
+        }
+        if(daysClosed < -1) {
+        	System.out.println("Days closed parameter too low. Setting to -1");
+        	daysClosed = -1;
+        	Main.pref.putInteger(ConfigKeys.NOTES_SEARCH_DAYS_CLOSED, daysClosed);
+        }
+        List<Note> searchResults = NotesApi.getNotesApi().searchNotes(searchTerm, noteLimit, daysClosed);
         System.out.println("search results: " + searchResults.size());
         plugin.getDataSet().clear();
         plugin.getDataSet().addAll(searchResults);
