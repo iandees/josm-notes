@@ -40,7 +40,9 @@ import org.openstreetmap.josm.tools.Utils;
 import org.xml.sax.SAXException;
 
 public class NotesApi extends OsmConnection {
-	
+
+    public static final int NOTE_DOWNLOAD_LIMIT = 10000;
+
 	private static String version = "0.6";
 	private String serverUrl;
 	private static HashMap<String, NotesApi> instances = new HashMap<String, NotesApi>();
@@ -176,7 +178,7 @@ public class NotesApi extends OsmConnection {
      * @throws OsmTransferException
      */
     public List<Note> searchNotes(String searchTerm, Integer bugLimit, Integer closedDays) throws OsmTransferException {
-        if(bugLimit != null && (bugLimit < 1 || bugLimit > 9999)) {
+        if(bugLimit != null && (bugLimit < 1 || bugLimit > NOTE_DOWNLOAD_LIMIT)) {
             throw new IllegalArgumentException("Bug limit must be between 1 and 9999");
         }
         if(closedDays != null && closedDays < -1) {
