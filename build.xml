@@ -69,7 +69,7 @@
     	<exec executable="git" outputproperty="git.commit.date" failifexecutionfails="false" errorproperty="">
 			<arg value="show"/>
 			<arg value="-s"/>
-			<arg value="--format=%ci"/>
+			<arg value="--pretty=format:%ci"/>
 			<arg value="HEAD"/>
 		</exec>
     </target>
