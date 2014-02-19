@@ -30,13 +30,13 @@ package org.openstreetmap.josm.plugins.notes.api;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
+import org.openstreetmap.josm.plugins.notes.api.util.NotesCapableOsmApi;
 
 public class EditAction {
 
     public void execute(Note n, String comment) throws OsmTransferException {
 
-        Note newNote = NotesApi.getNotesApi().AddCommentToNote(n, comment);
+        Note newNote = NotesCapableOsmApi.getNotesApi().AddCommentToNote(n, comment);
 
     	if (newNote != null) {
     		n.updateWith(newNote);
