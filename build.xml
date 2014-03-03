@@ -45,7 +45,7 @@
                 <attribute name="Author" value="Ian Dees and Toby Murray"/>
                 <attribute name="Plugin-Class" value="org.openstreetmap.josm.plugins.notes.NotesPlugin"/>
             	<attribute name="Plugin-Date" value="${git.commit.date}"/>
-                <attribute name="Plugin-Description" value="Manipulate and display notes from OpenStreetMap.org (OAuth users must be using JOSM 6070 or higher - please read wiki)"/>
+                <attribute name="Plugin-Description" value="Manipulate and display notes from OpenStreetMap.org"/>
                 <attribute name="Plugin-Icon" value="images/dialogs/note_icon24.png"/>
                 <attribute name="Plugin-Link" value="http://wiki.openstreetmap.org/index.php/JOSM/Plugins/Notes"/>
                 <attribute name="Plugin-Mainversion" value="${plugin.main.version}"/>
