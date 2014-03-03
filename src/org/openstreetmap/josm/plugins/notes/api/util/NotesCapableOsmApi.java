@@ -15,6 +15,8 @@ import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.io.OsmApi;
+import org.openstreetmap.josm.io.OsmApiInitializationException;
+import org.openstreetmap.josm.io.OsmTransferCanceledException;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
@@ -217,6 +219,15 @@ public class NotesCapableOsmApi extends OsmApi {
         NotesCapableOsmApi api = instances.get(serverUrl);
     	if (api == null) {
     		api = new NotesCapableOsmApi(serverUrl);
+    		try {
+    			api.initialize(null);
+    		} catch(OsmApiInitializationException e) {
+    			Main.error("problem initializing Notes API");
+    			e.printStackTrace();
+    		} catch(OsmTransferCanceledException e) {
+    			Main.error("problem initializing Notes API");
+    			e.printStackTrace();
+    		}
     		instances.put(serverUrl, api);
     	}
     	return api;
