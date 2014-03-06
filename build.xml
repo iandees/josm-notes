@@ -17,7 +17,7 @@
 -->
 <project name="notes" default="dist" basedir=".">
     <property name="commit.message" value="Changed the constructor signature of the plugin main class"/>
-    <property name="plugin.main.version" value="6076"/>
+    <property name="plugin.main.version" value="6875"/>
     <property name="josm" location="../josm/dist/josm-custom.jar"/>
     <property name="plugin.dist.dir" value="../josm/dist"/>
     <property name="plugin.build.dir" value="build"/>
@@ -45,7 +45,7 @@
                 <attribute name="Author" value="Ian Dees and Toby Murray"/>
                 <attribute name="Plugin-Class" value="org.openstreetmap.josm.plugins.notes.NotesPlugin"/>
             	<attribute name="Plugin-Date" value="${git.commit.date}"/>
-                <attribute name="Plugin-Description" value="Manipulate and display notes from OpenStreetMap.org (OAuth users must be using JOSM 6070 or higher - please read wiki)"/>
+                <attribute name="Plugin-Description" value="Manipulate and display notes from OpenStreetMap.org"/>
                 <attribute name="Plugin-Icon" value="images/dialogs/note_icon24.png"/>
                 <attribute name="Plugin-Link" value="http://wiki.openstreetmap.org/index.php/JOSM/Plugins/Notes"/>
                 <attribute name="Plugin-Mainversion" value="${plugin.main.version}"/>

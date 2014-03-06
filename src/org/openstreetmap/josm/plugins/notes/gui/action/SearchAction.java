@@ -13,7 +13,7 @@ import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
-import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
+import org.openstreetmap.josm.plugins.notes.api.util.NotesCapableOsmApi;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;
 
@@ -66,9 +66,9 @@ public class SearchAction extends NotesAction {
             noteLimit = 1;
             Main.pref.putInteger(ConfigKeys.NOTES_SEARCH_LIMIT, noteLimit);
         }
-        if(noteLimit > NotesApi.NOTE_DOWNLOAD_LIMIT) {
+        if(noteLimit > NotesCapableOsmApi.NOTE_DOWNLOAD_LIMIT) {
             System.out.println("Note download limit too high. Setting to API limit");
-            noteLimit = NotesApi.NOTE_DOWNLOAD_LIMIT;
+            noteLimit = NotesCapableOsmApi.NOTE_DOWNLOAD_LIMIT;
             Main.pref.putInteger(ConfigKeys.NOTES_SEARCH_LIMIT, noteLimit);
         }
         if(daysClosed < -1) {
@@ -76,7 +76,7 @@ public class SearchAction extends NotesAction {
             daysClosed = -1;
             Main.pref.putInteger(ConfigKeys.NOTES_SEARCH_DAYS_CLOSED, daysClosed);
         }
-        List<Note> searchResults = NotesApi.getNotesApi().searchNotes(searchTerm, noteLimit, daysClosed);
+        List<Note> searchResults = NotesCapableOsmApi.getNotesApi().searchNotes(searchTerm, noteLimit, daysClosed);
         System.out.println("search results: " + searchResults.size());
         plugin.getDataSet().clear();
         plugin.getDataSet().addAll(searchResults);

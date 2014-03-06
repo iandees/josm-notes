@@ -34,7 +34,7 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
+import org.openstreetmap.josm.plugins.notes.api.util.NotesCapableOsmApi;
 import org.openstreetmap.josm.tools.OsmUrlToBounds;
 
 public class DownloadAction {
@@ -51,7 +51,7 @@ public class DownloadAction {
         }
 
         try {
-        	List<Note> notes = NotesApi.getNotesApi().getNotesInBoundingBox(bounds);
+            List<Note> notes = NotesCapableOsmApi.getNotesApi().getNotesInBoundingBox(bounds);
             dataset.clear();
             dataset.addAll(notes);
         }

@@ -32,10 +32,10 @@ import java.io.IOException;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.api.util.NotesApi;
+import org.openstreetmap.josm.plugins.notes.api.util.NotesCapableOsmApi;
 
 public class NewAction {
     public Note execute(LatLon latlon, String text) throws IOException, OsmTransferException {
-        return NotesApi.getNotesApi().createNote(latlon, text);
+        return NotesCapableOsmApi.getNotesApi().createNote(latlon, text);
     }
 }
