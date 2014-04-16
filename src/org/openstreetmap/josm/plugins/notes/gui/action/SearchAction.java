@@ -145,10 +145,12 @@ public class SearchAction extends NotesAction {
         @Override
         protected void realRun() throws SAXException, IOException,
         OsmTransferException {
-            ProgressMonitor monitor = new PleaseWaitProgressMonitor();
+            PleaseWaitProgressMonitor monitor = new PleaseWaitProgressMonitor();
             List<Note> noteList = NotesCapableOsmApi.getNotesApi().searchNotes(searchTerm, bugLimit, closedDays, monitor);
             Main.info("found notes: " + noteList.size());
             returnedNotes.addAll(noteList);
+            //shouldn't be needed because the API calls finishTask but apparently the PleaseWaitProgressMonitor is buggy
+            monitor.close();
         }
 
         @Override
