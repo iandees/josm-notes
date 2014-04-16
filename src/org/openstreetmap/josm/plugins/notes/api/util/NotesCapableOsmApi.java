@@ -163,7 +163,8 @@ public class NotesCapableOsmApi extends OsmApi {
         if(monitor == null) {
             monitor = NullProgressMonitor.INSTANCE;
         }
-        monitor.beginTask("Searching notes");
+        monitor.beginTask(tr("Searching for notes"), 3);
+        
         if(bugLimit != null && (bugLimit < 1 || bugLimit > NOTE_DOWNLOAD_LIMIT)) {
             throw new IllegalArgumentException("Bug limit must be between 1 and 9999");
         }
@@ -190,13 +191,22 @@ public class NotesCapableOsmApi extends OsmApi {
         }
         String url = urlBuilder.toString();
         monitor.worked(1);
-        monitor.indeterminateSubTask("Querying the API for notes");
-        String response = sendRequest("GET", url, null, monitor, false, false);
-        monitor.worked(1);
-        monitor.indeterminateSubTask("parsing notes");
-        List<Note> notes = parseNotes(response);
-        monitor.worked(1);
-        monitor.finishTask();
+        
+        List<Note> notes = new ArrayList<Note>();
+        try {
+            monitor.indeterminateSubTask(tr("Querying the API for notes"));
+            String response = sendRequest("GET", url, null, monitor, false, false);
+            monitor.worked(1);
+            
+            monitor.indeterminateSubTask(tr("Parsing API response"));
+            notes = parseNotes(response);
+            monitor.worked(1);
+        } catch(Exception e) {
+            Main.error(e);
+            throw new OsmTransferException(e);
+        } finally {
+            monitor.finishTask();
+        }
         return notes;
     }
 	
