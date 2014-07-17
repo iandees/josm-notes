@@ -97,7 +97,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
     private JToggleButton toggleConnectionMode;
     private JTabbedPane tabbedPane = new JTabbedPane();
     private boolean queuePanelVisible = false;
-    private final ActionQueue actionQueue = new ActionQueue();
+    private final ActionQueue actionQueue = new ActionQueue(this);
 
     private boolean buttonLabels = Main.pref.getBoolean(ConfigKeys.NOTES_BUTTON_LABELS);
 
