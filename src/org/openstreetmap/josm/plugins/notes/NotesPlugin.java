@@ -140,78 +140,85 @@ public class NotesPlugin extends Plugin implements LayerChangeListener, ZoomChan
     }
 
     public void updateData() {
-        // disable the dialog
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if (dialog != null) {
-                        dialog.setEnabled(false);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // store the current selected node
-        Note selectedNote = getDialog().getSelectedNote();
-
-        // determine the bounds of the currently visible area
-        Bounds bounds = null;
-        try {
-            bounds = bounds();
-        } catch (Exception e) {
-            // something went wrong, probably the mapview isn't fully initialized
-            System.err.println("Notes: Couldn't determine bounds of currently visible rect. Cancel auto update");
-            return;
-        }
-
-
-        // download data for the new bounds, if the plugin is not in offline mode
-        if(!Main.pref.getBoolean(ConfigKeys.NOTES_API_OFFLINE)) {
+        UpdateNotesTask task = new UpdateNotesTask();
+        Main.worker.submit(task);
+    }
+    
+    private class UpdateNotesTask implements Runnable {
+        public void run() {
             try {
-                // download the data
-                download.execute(allNotes, bounds);
-
-                // display the parsed data
-                if(!allNotes.isEmpty() && dialog.isDialogShowing()) {
-                    // if the map layer has been closed, while we are requesting the osb db,
-                    // we don't have to update the gui, because the user is not interested
-                    // in this area anymore
-                    if(Main.map != null && Main.map.mapView != null) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateGui();
-                            }
-                        });
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (dialog != null) {
+                            dialog.setEnabled(false);
+                        }
                     }
-                }
+                });
             } catch (Exception e) {
-                if (e instanceof java.net.UnknownHostException) {
-                    String message = String.format(tr("Unknown Host: %s - Possibly there is no connection to the Internet.")
-                            , e.getMessage());
-                    JOptionPane.showMessageDialog(Main.parent, message);
-                } else {
-                    JOptionPane.showMessageDialog(Main.parent, e.getMessage());
-                }
                 e.printStackTrace();
             }
-        }
+
+            // store the current selected node
+            Note selectedNote = getDialog().getSelectedNote();
+
+            // determine the bounds of the currently visible area
+            Bounds bounds = null;
+            try {
+                bounds = bounds();
+            } catch (Exception e) {
+                // something went wrong, probably the mapview isn't fully initialized
+                System.err.println("Notes: Couldn't determine bounds of currently visible rect. Cancel auto update");
+                return;
+            }
 
 
-        // restore node selection
-        dialog.setSelectedNote(selectedNote);
+            // download data for the new bounds, if the plugin is not in offline mode
+            if(!Main.pref.getBoolean(ConfigKeys.NOTES_API_OFFLINE)) {
+                try {
+                    // download the data
+                    download.execute(allNotes, bounds);
 
-        // enable the dialog
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    dialog.setEnabled(true);
+                    // display the parsed data
+                    if(!allNotes.isEmpty() && dialog.isDialogShowing()) {
+                        // if the map layer has been closed, while we are requesting the osb db,
+                        // we don't have to update the gui, because the user is not interested
+                        // in this area anymore
+                        if(Main.map != null && Main.map.mapView != null) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateGui();
+                                }
+                            });
+                        }
+                    }
+                } catch (Exception e) {
+                    if (e instanceof java.net.UnknownHostException) {
+                        String message = String.format(tr("Unknown Host: %s - Possibly there is no connection to the Internet.")
+                                , e.getMessage());
+                        JOptionPane.showMessageDialog(Main.parent, message);
+                    } else {
+                        JOptionPane.showMessageDialog(Main.parent, e.getMessage());
+                    }
+                    e.printStackTrace();
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
+            }
+
+
+            // restore node selection
+            dialog.setSelectedNote(selectedNote);
+
+            // enable the dialog
+            try {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        dialog.setEnabled(true);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
         }
     }
 

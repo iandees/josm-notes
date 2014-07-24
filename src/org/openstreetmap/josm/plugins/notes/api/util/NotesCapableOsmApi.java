@@ -159,14 +159,18 @@ public class NotesCapableOsmApi extends OsmApi {
      * @return List of notes matching the search criteria or empty list if no matches are found
      * @throws OsmTransferException
      */
-    public List<Note> searchNotes(String searchTerm, Integer bugLimit, Integer closedDays) throws OsmTransferException {
+    public List<Note> searchNotes(String searchTerm, Integer bugLimit, Integer closedDays, ProgressMonitor monitor) throws OsmTransferException {
+        if(monitor == null) {
+            monitor = NullProgressMonitor.INSTANCE;
+        }
+        monitor.beginTask(tr("Searching for notes"), 3);
+        
         if(bugLimit != null && (bugLimit < 1 || bugLimit > NOTE_DOWNLOAD_LIMIT)) {
             throw new IllegalArgumentException("Bug limit must be between 1 and 9999");
         }
         if(closedDays != null && closedDays < -1) {
             throw new IllegalArgumentException("Closed date must be -1 or greater");
         }
-        ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
         String searchTermEncoded = "";
         try {
             searchTermEncoded = URLEncoder.encode(searchTerm, "UTF-8");
@@ -186,8 +190,24 @@ public class NotesCapableOsmApi extends OsmApi {
             urlBuilder.append(closedDays);
         }
         String url = urlBuilder.toString();
-        String response = sendRequest("GET", url, null, monitor, false, false);
-        return parseNotes(response);
+        monitor.worked(1);
+        
+        List<Note> notes = new ArrayList<Note>();
+        try {
+            monitor.indeterminateSubTask(tr("Querying the API for notes"));
+            String response = sendRequest("GET", url, null, monitor, false, false);
+            monitor.worked(1);
+            
+            monitor.indeterminateSubTask(tr("Parsing API response"));
+            notes = parseNotes(response);
+            monitor.worked(1);
+        } catch(Exception e) {
+            Main.error(e);
+            throw new OsmTransferException(e);
+        } finally {
+            monitor.finishTask();
+        }
+        return notes;
     }
 	
 	private List<Note> parseNotes(String notesXml) {
