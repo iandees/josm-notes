@@ -52,7 +52,7 @@ public class ActionQueue extends AbstractListModel {
     }
 
     public void processQueue() throws Exception {
-        final QueueProcessTask task = new QueueProcessTask("Processing notes queue");
+        final QueueProcessTask task = new QueueProcessTask(tr("Processing notes queue"));
         task.initParams(queue);
         Main.worker.submit(task);
     }
