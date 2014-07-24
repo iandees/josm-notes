@@ -15,7 +15,7 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.xml.sax.SAXException;
 
-public class ActionQueue extends AbstractListModel {
+public class ActionQueue extends AbstractListModel<NotesAction> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -68,7 +68,6 @@ public class ActionQueue extends AbstractListModel {
     private class QueueProcessTask extends PleaseWaitRunnable {
         
         private boolean isCancelled = false;
-        private boolean isFinished = false;
         LinkedList<NotesAction> queue;
         
         public QueueProcessTask(String title) {
@@ -114,7 +113,6 @@ public class ActionQueue extends AbstractListModel {
             }
             finally {
                 monitor.close();
-                isFinished = true;
             }
         }
         

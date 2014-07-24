@@ -82,9 +82,9 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
 
     private static final long serialVersionUID = 1L;
     private JPanel bugListPanel, queuePanel;
-    private DefaultListModel bugListModel;
-    private JList bugList;
-    private JList queueList;
+    private DefaultListModel<Note> bugListModel;
+    private JList<Note> bugList;
+    private JList<NotesAction> queueList;
     private NotesPlugin notesPlugin;
     private boolean fireSelectionChanged = true;
     private JButton refresh;
@@ -125,7 +125,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
 
     private class BugListSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
-            if (bugList.getSelectedValues().length == 0) {
+            if (bugList.getSelectedValuesList().size() == 0) {
                 addComment.setEnabled(false);
                 closeIssue.setEnabled(false);
                 reopenNote.setEnabled(false);
@@ -133,8 +133,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
             }
 
             List<Note> selected = new ArrayList<Note>();
-            for (Object n : bugList.getSelectedValues()) {
-                Note note = (Note)n;
+            for (Note note : bugList.getSelectedValuesList()) {
                 selected.add(note);
 
                 switch(note.getState()) {
@@ -174,8 +173,8 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
         bugListPanel.setName(tr("Bug list"));
         add(bugListPanel, BorderLayout.CENTER);
 
-        bugListModel = new DefaultListModel();
-        bugList = new JList(bugListModel);
+        bugListModel = new DefaultListModel<Note>();
+        bugList = new JList<Note>(bugListModel);
         bugList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         bugList.addListSelectionListener(new BugListSelectionListener());
         bugList.addMouseListener(new BugListMouseAdapter());
@@ -251,7 +250,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
 
         queuePanel = new JPanel(new BorderLayout());
         queuePanel.setName(tr("Queue"));
-        queueList = new JList(getActionQueue());
+        queueList = new JList<NotesAction>(getActionQueue());
         queueList.setCellRenderer(new NotesQueueListCellRenderer());
         queuePanel.add(new JScrollPane(queueList), BorderLayout.CENTER);
         queuePanel.add(processQueue, BorderLayout.SOUTH);
@@ -309,7 +308,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
 
     public synchronized void update(final Collection<Note> dataset) {
         // create a new list model
-        bugListModel = new DefaultListModel();
+        bugListModel = new DefaultListModel<Note>();
         List<Note> sortedList = new ArrayList<Note>(dataset);
         Collections.sort(sortedList, new BugComparator());
         for (Note note : sortedList) {
@@ -324,7 +323,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
 
     private void scrollToSelected(Note node) {
         for (int i = 0; i < bugListModel.getSize(); i++) {
-            Note current = (Note)bugListModel.get(i);
+            Note current = bugListModel.get(i);
             if (current.getId()== node.getId()) {
                 bugList.scrollRectToVisible(bugList.getCellBounds(i, i));
                 bugList.setSelectedIndex(i);
@@ -408,7 +407,7 @@ public class NotesDialog extends ToggleDialog implements NotesObserver, LayerCha
 
     public Note getSelectedNote() {
         if(bugList.getSelectedValue() != null) {
-            return (Note)bugList.getSelectedValue();
+            return bugList.getSelectedValue();
         } else {
             return null;
         }

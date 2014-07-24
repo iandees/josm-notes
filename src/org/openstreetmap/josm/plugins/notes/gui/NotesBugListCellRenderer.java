@@ -44,17 +44,15 @@ import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.Note.Comment;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
-public class NotesBugListCellRenderer implements ListCellRenderer {
+public class NotesBugListCellRenderer implements ListCellRenderer<Note> {
 
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
 
     private SimpleDateFormat dayFormat = new SimpleDateFormat("MMM d, yyyy");
-	
-    public Component getListCellRendererComponent(JList list, Object n, int index, boolean isSelected,
+    
+    public Component getListCellRendererComponent(JList<? extends Note> list, Note note, int index, boolean isSelected,
             boolean cellHasFocus) {
-    	
-    	Note note = (Note)n;
 
         JLabel label = new JLabel();
         label.setOpaque(true);
@@ -106,7 +104,4 @@ public class NotesBugListCellRenderer implements ListCellRenderer {
         label.setEnabled(list.isEnabled());
         return label;
     }
-
-
-
 }

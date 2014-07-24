@@ -41,14 +41,15 @@ import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.gui.action.AddCommentAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.CloseNoteAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.NewNoteAction;
+import org.openstreetmap.josm.plugins.notes.gui.action.NotesAction;
 import org.openstreetmap.josm.plugins.notes.gui.action.ReopenAction;
 
-public class NotesQueueListCellRenderer implements ListCellRenderer {
+public class NotesQueueListCellRenderer implements ListCellRenderer<NotesAction> {
 
     private Color background = Color.WHITE;
     private Color altBackground = new Color(250, 250, 220);
 
-    public Component getListCellRendererComponent(JList list, Object action, int index, boolean isSelected,
+    public Component getListCellRendererComponent(JList<? extends NotesAction> list, NotesAction action, int index, boolean isSelected,
             boolean cellHasFocus) {
     	
     	
