@@ -15,6 +15,7 @@ import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
+import org.openstreetmap.josm.io.NoteReader.NoteParseMode;
 import org.openstreetmap.josm.io.OsmApi;
 import org.openstreetmap.josm.io.NoteReader;
 import org.openstreetmap.josm.io.OsmApiInitializationException;
@@ -214,7 +215,7 @@ public class NotesCapableOsmApi extends OsmApi {
 	private List<Note> parseNotes(String notesXml) {
 		try {
 		    InputStream is = new ByteArrayInputStream(notesXml.getBytes(StandardCharsets.UTF_8));
-	        NoteReader noteReader = new NoteReader(is);
+	        NoteReader noteReader = new NoteReader(is, NoteParseMode.API);
 	        return noteReader.parse();
         } catch (SAXException e) {
             e.printStackTrace();
