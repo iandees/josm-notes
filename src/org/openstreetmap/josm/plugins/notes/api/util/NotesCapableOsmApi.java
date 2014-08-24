@@ -1,13 +1,14 @@
 package org.openstreetmap.josm.plugins.notes.api.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
@@ -15,11 +16,11 @@ import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.io.OsmApi;
+import org.openstreetmap.josm.io.NoteReader;
 import org.openstreetmap.josm.io.OsmApiInitializationException;
 import org.openstreetmap.josm.io.OsmTransferCanceledException;
 import org.openstreetmap.josm.io.OsmTransferException;
-import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.NotesXmlParser;
+import org.openstreetmap.josm.data.notes.Note;
 import org.xml.sax.SAXException;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
@@ -212,12 +213,12 @@ public class NotesCapableOsmApi extends OsmApi {
 	
 	private List<Note> parseNotes(String notesXml) {
 		try {
-            return NotesXmlParser.parseNotes(notesXml);
+		    InputStream is = new ByteArrayInputStream(notesXml.getBytes(StandardCharsets.UTF_8));
+	        NoteReader noteReader = new NoteReader(is);
+	        return noteReader.parse();
         } catch (SAXException e) {
             e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        }  catch (IOException e) {
         	e.printStackTrace();
         }
 		return new ArrayList<Note>();

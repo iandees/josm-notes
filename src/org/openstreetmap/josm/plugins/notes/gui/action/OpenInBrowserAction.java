@@ -36,7 +36,7 @@ import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AbstractInfoAction;
-import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.data.notes.Note;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.OpenBrowser;
 

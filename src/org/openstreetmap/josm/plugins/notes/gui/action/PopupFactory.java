@@ -32,7 +32,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.data.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 

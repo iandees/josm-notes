@@ -42,7 +42,7 @@ import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.io.OsmApiException;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
-import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.data.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.NewAction;
 import org.openstreetmap.josm.plugins.notes.gui.dialogs.TextInputDialog;

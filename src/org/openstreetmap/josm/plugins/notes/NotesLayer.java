@@ -54,9 +54,11 @@ import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.io.XmlWriter;
-import org.openstreetmap.josm.plugins.notes.Note.Comment;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.ColorHelper;
+
+import org.openstreetmap.josm.data.notes.Note;
+import org.openstreetmap.josm.data.notes.NoteComment;
 
 public class NotesLayer extends Layer implements MouseListener {
 
@@ -167,9 +169,9 @@ public class NotesLayer extends Layer implements MouseListener {
             // draw description
             StringBuilder sb = new StringBuilder("<html>");
             //sb.append(note.getFirstComment().getText());
-            List<Comment> comments = note.getComments();
+            List<NoteComment> comments = note.getComments();
             String sep = "";
-            for (Comment comment : comments) {
+            for (NoteComment comment : comments) {
                 String commentText = comment.getText();
                 //closing a note creates an empty comment that we don't want to show
                 if (commentText != null && commentText.trim().length() > 0) {
@@ -180,7 +182,7 @@ public class NotesLayer extends Layer implements MouseListener {
                     }
                     sb.append(userName);
                     sb.append(" on ");
-                    sb.append(dayFormat.format(comment.getCreatedAt()));
+                    sb.append(dayFormat.format(comment.getCommentTimestamp()));
                     sb.append(":<br/>");
                     String htmlText = XmlWriter.encode(comment.getText(), true);
                     htmlText = htmlText.replace("&#xA;", "<br/>"); //encode method leaves us with entity instead of \n
@@ -287,4 +289,38 @@ public class NotesLayer extends Layer implements MouseListener {
         selection.add(selected);
         Main.map.mapView.repaint();
     }
+/*
+    @Override
+    public boolean isModified() {
+        Main.info("checking on exit. queue size: " + dialog.getActionQueue().getSize());
+        return dialog.getActionQueue().getSize() != 0;
+    }
+    
+    @Override
+    public boolean requiresUploadToServer() {
+        return true;
+    }
+    
+    @Override
+    public boolean isSavable() {
+        return false;
+    }
+    
+    public AbstractIOTask createUploadTask(ProgressMonitor monitor) {
+        Main.info("upload task called");
+        try {
+        dialog.getActionQueue().processQueue();
+        }
+        catch (Exception e) {
+            Main.error("error while processing notes queue on exit:");
+            Main.error(e, true);
+        }
+        return null;
+    }
+    
+    public AbstractUploadDialog getUploadDialog() {
+        Main.info("upload dialog called");
+        return null;
+    }
+*/
 }

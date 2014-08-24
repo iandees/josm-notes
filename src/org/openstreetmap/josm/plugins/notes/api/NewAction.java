@@ -31,7 +31,7 @@ import java.io.IOException;
 
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.io.OsmTransferException;
-import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.data.notes.Note;
 import org.openstreetmap.josm.plugins.notes.api.util.NotesCapableOsmApi;
 
 public class NewAction {

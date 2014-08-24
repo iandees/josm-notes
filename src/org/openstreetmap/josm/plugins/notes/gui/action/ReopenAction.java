@@ -9,7 +9,7 @@ import java.util.List;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.widgets.HistoryChangedListener;
 import org.openstreetmap.josm.plugins.notes.ConfigKeys;
-import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.data.notes.Note;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 import org.openstreetmap.josm.plugins.notes.api.util.NotesCapableOsmApi;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;

@@ -29,7 +29,7 @@ package org.openstreetmap.josm.plugins.notes.api;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmTransferException;
-import org.openstreetmap.josm.plugins.notes.Note;
+import org.openstreetmap.josm.data.notes.Note;
 import org.openstreetmap.josm.plugins.notes.api.util.NotesCapableOsmApi;
 
 public class EditAction {

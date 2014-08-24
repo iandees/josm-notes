@@ -40,8 +40,8 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
-import org.openstreetmap.josm.plugins.notes.Note;
-import org.openstreetmap.josm.plugins.notes.Note.Comment;
+import org.openstreetmap.josm.data.notes.Note;
+import org.openstreetmap.josm.data.notes.NoteComment;
 import org.openstreetmap.josm.plugins.notes.NotesPlugin;
 
 public class NotesBugListCellRenderer implements ListCellRenderer<Note> {
@@ -81,7 +81,7 @@ public class NotesBugListCellRenderer implements ListCellRenderer<Note> {
         label.setIcon(icon);
 
         StringBuilder sb = new StringBuilder();
-        Comment firstComment = note.getFirstComment();
+        NoteComment firstComment = note.getFirstComment();
         String text = firstComment.getText();
         text = text.replace("\n", " ");
         sb.append(text);
@@ -93,7 +93,7 @@ public class NotesBugListCellRenderer implements ListCellRenderer<Note> {
         sb.append(userName);
         sb.append(tr(" on"));
         sb.append(" ");
-        sb.append(dayFormat.format(firstComment.getCreatedAt()));
+        sb.append(dayFormat.format(firstComment.getCommentTimestamp()));
         sb.append(")");
         label.setText(sb.toString());
 

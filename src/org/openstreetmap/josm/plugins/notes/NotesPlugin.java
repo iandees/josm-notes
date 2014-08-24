@@ -58,6 +58,8 @@ import org.openstreetmap.josm.plugins.notes.api.DownloadAction;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.ImageProvider;
 
+import org.openstreetmap.josm.data.notes.Note;
+
 /**
  * Shows notes from OpenStreetMap
  *
