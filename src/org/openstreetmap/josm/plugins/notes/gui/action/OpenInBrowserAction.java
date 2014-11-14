@@ -35,7 +35,6 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.actions.AbstractInfoAction;
 import org.openstreetmap.josm.plugins.notes.Note;
 import org.openstreetmap.josm.plugins.notes.gui.NotesDialog;
 import org.openstreetmap.josm.tools.OpenBrowser;
@@ -54,7 +53,7 @@ public class OpenInBrowserAction extends NotesAction {
     protected void doActionPerformed(ActionEvent e) throws Exception {
         note = dialog.getSelectedNote();
         if(note != null) {
-            String uri = AbstractInfoAction.getBaseBrowseUrl() + "/note/" + note.getId();
+            String uri = Main.getBaseBrowseUrl() + "/note/" + note.getId();
             System.out.println("Opening URI " + uri);
             OpenBrowser.displayUrl(uri);
         } else {
